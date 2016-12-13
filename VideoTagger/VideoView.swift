@@ -10,7 +10,7 @@ import UIKit
 import AVFoundation
 
 class VideoView: UIView {
-    
+    //somecomment
     
     var player: AVPlayer?
     var startTime: String = ""

@@ -43,8 +43,11 @@ class ViewController: UIViewController {
     
     
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        var someTags = Tagpoint.addUser(representation: <#T##AnyObject#>)
+        
         
         tagsTableviewLauncher.tableView.delegate = self
         NotificationCenter.default.addObserver(self, selector: #selector(enableSeekTime), name: Notification.Name("SeekToTime"), object: nil)
