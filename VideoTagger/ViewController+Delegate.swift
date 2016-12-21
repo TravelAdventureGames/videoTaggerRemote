@@ -37,8 +37,7 @@ extension ViewController: UITableViewDelegate {
         isInEditMode = true
         titleTextField.isUserInteractionEnabled = false
         descriptionTextView.isUserInteractionEnabled = false
-        startBtnLabel.isEnabled = false
-        endBtnLabel.isEnabled = false
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel], dissAble: [true, true])
         
         
         if let selectedCell: TagpointTableCell = tableView.cellForRow(at: indexPath) as! TagpointTableCell? {

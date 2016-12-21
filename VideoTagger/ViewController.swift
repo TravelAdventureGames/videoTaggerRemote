@@ -47,11 +47,7 @@ class ViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(enableSeekTime), name: Notification.Name("SeekToTime"), object: nil)
         
         loadSavedTagpoints()
-        
-//        startBtnLabel.isEnabled = true
-//        endBtnLabel.isEnabled = false
-        disAndEnableButton(button: startBtnLabel, disable: false)
-        disAndEnableButton(button: endBtnLabel, disable: true)
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel], dissAble: [false, true])
         
         makeAllViewButtons()
         makeNavTitleViewWithImage()
@@ -63,9 +59,7 @@ class ViewController: UIViewController {
 
     @IBAction func startTime(_ sender: AnyObject) {
         beginTimeWasSet = true
-        //endBtnLabel.isEnabled = true
-        disAndEnableButton(button: endBtnLabel, disable: false)
-        
+        disAndEnableMultipleButtons(buttons: [endBtnLabel, startBtnLabel], dissAble: [false, true])
         videoView.handlePause()
         videoView.startTimeSet = true
         videoView.startPointView.isHidden = false
@@ -78,6 +72,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func endTime(_ sender: AnyObject) {
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel], dissAble: [true, true])
         endTimeWasSet = true
         videoView.handlePause()
         videoView.endPointView.isHidden = false
@@ -91,11 +86,7 @@ class ViewController: UIViewController {
     }
     
     @IBAction func resetTimes(_ sender: AnyObject) {
-//        startBtnLabel.isEnabled = true
-//        endBtnLabel.isEnabled = false
-        disAndEnableButton(button: startBtnLabel, disable: false)
-        disAndEnableButton(button: endBtnLabel, disable: true)
-        
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel], dissAble: [false, true])
         endTimeWasSet = false
         beginTimeWasSet = false
         titleTextField.text = nil
@@ -118,6 +109,7 @@ class ViewController: UIViewController {
     
     func saveTagpointsAndReloadTableView() {
         tagsTableviewLauncher.tagpoints = tagPoints
+        videoView.tagpoints = tagPoints
         UserDefaults.standard.set(tagPoints, forKey: "subscription")
         tagsTableviewLauncher.tableView.reloadData()
     }
@@ -125,6 +117,7 @@ class ViewController: UIViewController {
     
     @IBAction func subMitTagPoint(_ sender: AnyObject) {
         setSelectedTableViewCellToDeselected()
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel], dissAble: [false, true])
         if isInEditMode {
             if let index = tagsTableviewLauncher.tableView.indexPathForSelectedRow {
                 tagsTableviewLauncher.tableView.deselectRow(at: index, animated: true)
@@ -148,10 +141,6 @@ class ViewController: UIViewController {
            
             
             tagPoints.append(tagPoint as [String : AnyObject])
-//            startBtnLabel.isEnabled = true
-//            endBtnLabel.isEnabled = false
-            disAndEnableButton(button: startBtnLabel, disable: false)
-            disAndEnableButton(button: endBtnLabel, disable: true)
             
             saveTagpointsAndReloadTableView()
             
@@ -185,11 +174,7 @@ class ViewController: UIViewController {
     @IBAction func createNewTag(_ sender: AnyObject) {
         clearAllInputFiels()
         switchToEditingMode(self)
-//        startBtnLabel.isEnabled = true
-//        endBtnLabel.isEnabled = false
-        disAndEnableButton(button: startBtnLabel, disable: false)
-        disAndEnableButton(button: endBtnLabel, disable: true)
-        
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel], dissAble: [false, true])
         isInEditMode = false
         setSelectedTableViewCellToDeselected()
         
@@ -199,6 +184,7 @@ class ViewController: UIViewController {
     @IBAction func switchToEditingMode(_ sender: AnyObject) {
         titleTextField.isUserInteractionEnabled = true
         descriptionTextView.isUserInteractionEnabled = true
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel], dissAble: [true, true])
         
         
     }
@@ -248,7 +234,7 @@ class ViewController: UIViewController {
     
     func makeAllViewButtons() {
         submitBtnLabel.layer.cornerRadius = 12
-        submitBtnLabel.setTitle("Submit", for: .normal)
+        submitBtnLabel.setTitle("Save", for: .normal)
         resetButton.setTitle("Reset", for: .normal)
         endBtnLabel.setTitle("Add end", for: .normal)
         guard let editImage = UIImage(named: "edit2")?.withRenderingMode(.alwaysOriginal) else { return }
@@ -285,14 +271,18 @@ class ViewController: UIViewController {
         descriptionTextView.layer.borderColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 0.5).cgColor
     }
     
-    func disAndEnableButton(button: UIButton, disable: Bool) {
-        switch disable {
-        case true:
-            button.isEnabled = false
-            button.alpha = 0.5
-        case false:
-            button.isEnabled = true
-            button.alpha = 1.0
+    
+    func disAndEnableMultipleButtons(buttons: [UIButton], dissAble: [Bool]) {
+        for (index, button) in buttons.enumerated() {
+            switch dissAble[index] {
+            case true:
+                button.isEnabled = false
+                button.alpha = 0.5
+            case false:
+                button.isEnabled = true
+                button.alpha = 1.0
+            }
+            
         }
     }
 }

@@ -119,7 +119,7 @@ class VideoView: UIView {
 
     }
     
-    func loadSavedTagpoints(completion: () -> Void) {
+    func loadSavedTagpoints() {
         if let subs = UserDefaults.standard.array(forKey: "subscription") as? [[String: AnyObject]] {
             var tagpoints = subs as [[String : AnyObject]]
             let sortedTagpoints = tagpoints.sorted {
@@ -129,7 +129,7 @@ class VideoView: UIView {
                 return time1 < time2
             }
             tagpoints = sortedTagpoints
-            completion()
+            
         }
     }
     
@@ -376,12 +376,12 @@ class VideoView: UIView {
         endPointView.widthAnchor.constraint(equalToConstant: 16).isActive = true
         endPointView.heightAnchor.constraint(equalToConstant: 16).isActive = true
     }
+    
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        if let subs = UserDefaults.standard.array(forKey: "subscription") as? [[String: AnyObject]] {
-            tagpoints = subs as [[String : AnyObject]]
-        }
+        loadSavedTagpoints()
+    
     }
 
     required init?(coder aDecoder: NSCoder) {
