@@ -18,29 +18,34 @@ class Tagpoint: NSObject {
     var endTime: Double?
     var title: String?
     var comment: String?
+    var begMult: Double?
+    var endMult: Double?
     
     init?(representation: AnyObject) {
         if let data = (representation as! NSDictionary).value(forKey: "subscription") as? [String: AnyObject] {
-            title = data["title"] as? String ?? ""
-            comment = data["comment"] as? String ?? ""
-            beginTime = data["beginTime"] as? Double ?? 0
-            endTime = data["endTime"] as? Double ?? 0
+            title = data["title"] as? String
+            comment = data["comment"] as? String
+            beginTime = data["beginTime"] as? Double
+            endTime = data["endTime"] as? Double
+            begMult = data["begMult"] as? Double
+            endMult = data["endMult"] as? Double
     
         }
     }
-    
-    static func addUser(representation: AnyObject) -> [Tagpoint] {
-        var tagpoints: [Tagpoint] = []
-        if let data = ((representation as! NSDictionary).value(forKey: "subscription") as? [NSDictionary]) {
-            if let someData = data as? [[String: AnyObject]] {
-                for dt in someData {
-                    if let tagPoint = Tagpoint(representation: dt as AnyObject) {
-                        tagpoints.append(tagPoint)
-                    }
-                }
-            }
-        }
-        return tagpoints
-    }
-
 }
+    
+//    static func addUser(representation: AnyObject) -> [Tagpoint] {
+//        var tagpoints: [Tagpoint] = []
+//        if let data = ((representation as! [String: AnyObject]).value(forKey: "subscription") as? [NSDictionary]) {
+//            if let someData = data as? [[String: AnyObject]] {
+//                for dt in someData {
+//                    if let tagPoint = Tagpoint(representation: dt as AnyObject) {
+//                        tagpoints.append(tagPoint)
+//                    }
+//                }
+//            }
+//        }
+//        return tagpoints
+//    }
+//
+//}

@@ -131,7 +131,7 @@
                             <constraint firstItem="T86-aT-0X7" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="MF2-Pm-tNq"/>
                             <constraint firstItem="1KY-4F-EfL" firstAttribute="width" secondItem="ZIH-wp-dKA" secondAttribute="width" id="MeG-Io-va6"/>
                             <constraint firstItem="1KY-4F-EfL" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="OjB-vm-OvZ"/>
-                            <constraint firstItem="ZIH-wp-dKA" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="34" id="TRv-uO-gQ7"/>
+                            <constraint firstItem="ZIH-wp-dKA" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="70" id="TRv-uO-gQ7"/>
                             <constraint firstItem="ZIH-wp-dKA" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="X9h-9p-ZqI"/>
                             <constraint firstItem="T86-aT-0X7" firstAttribute="width" secondItem="ZIH-wp-dKA" secondAttribute="width" id="eMM-Qo-k5o"/>
                             <constraint firstItem="1KY-4F-EfL" firstAttribute="top" secondItem="A0T-Zr-0fa" secondAttribute="bottom" constant="8" id="gqn-lO-uGL"/>
@@ -156,7 +156,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="614.93411420204973" y="138.8671875"/>
+            <point key="canvasLocation" x="1274" y="-110"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="c9B-Dp-CpS">

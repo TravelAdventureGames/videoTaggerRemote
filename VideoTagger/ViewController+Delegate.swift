@@ -13,6 +13,12 @@ extension ViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         if let selectedCell: TagpointTableCell = tableView.cellForRow(at: indexPath) as! TagpointTableCell? {
+            let highlightedTag = videoView.titleTagDictArray[indexPath.row]
+            let label = highlightedTag["label"] as! UILabel
+            label.textColor = .gray
+            label.layer.borderColor = UIColor.gray.cgColor
+            label.layer.borderWidth = 0.5
+            label.backgroundColor = .white
             
             selectedCell.titleLabel.backgroundColor = UIColor(red: 203/255, green: 246/255, blue: 255/255, alpha: 0.6)
             selectedCell.titleLabel.textColor = .black
@@ -29,20 +35,32 @@ extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         editBtn.isHidden = false
         isInEditMode = true
-        selectedCellIndexpath = indexPath.row
-        
         titleTextField.isUserInteractionEnabled = false
         descriptionTextView.isUserInteractionEnabled = false
+        startBtnLabel.isEnabled = false
+        endBtnLabel.isEnabled = false
+        
         
         if let selectedCell: TagpointTableCell = tableView.cellForRow(at: indexPath) as! TagpointTableCell? {
+            let highlightedTag = videoView.titleTagDictArray[indexPath.row]
+            let label = highlightedTag["label"] as! UILabel
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.textColor = .white
+            label.layer.borderWidth = 0.8
+            label.layer.borderColor = UIColor.black.cgColor
+            label.backgroundColor = .red
+            label.layer.masksToBounds = true
+            //label.widthAnchor.constraint(equalToConstant: 140).isActive = true
+            
+            
             selectedCell.selectionStyle = .none
             selectedCell.titleLabel.backgroundColor = UIColor.red
             selectedCell.titleLabel.textColor = .white
             selectedCell.titleLabel.layer.masksToBounds = true
-            selectedCell.endTimeLabel.backgroundColor = .black
-            selectedCell.endTimeLabel.textColor = .white
-            selectedCell.beginTimeLabel.backgroundColor = .black
-            selectedCell.beginTimeLabel.textColor = .white
+            selectedCell.endTimeLabel.backgroundColor = .white
+            selectedCell.endTimeLabel.textColor = .black
+            selectedCell.beginTimeLabel.backgroundColor = .white
+            selectedCell.beginTimeLabel.textColor = .black
             selectedCell.totalView.layer.borderWidth = 1.2
             selectedCell.layer.shadowOffset = CGSize(width: 2, height: 2)
             selectedCell.layer.shadowRadius = 1

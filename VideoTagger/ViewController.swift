@@ -10,11 +10,7 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    var tagPoints: [[String: AnyObject]] = [] {
-        didSet {
-            
-        }
-    }
+    var tagPoints: [[String: AnyObject]] = [] 
     var allTagsShown = true
     var button = UIButton(type: .custom)
     var tagsTableviewLauncher = TagsTableviewLauncher()
@@ -29,6 +25,8 @@ class ViewController: UIViewController {
     
     var isInEditMode = false
     var selectedCellIndexpath: Int?
+    
+    var modelTagpoints: [Tagpoint]?
 
     @IBOutlet var videoView: VideoView!
     
@@ -40,35 +38,34 @@ class ViewController: UIViewController {
     @IBOutlet var resetButton: StartEndButton!
     @IBOutlet var titleTextField: UITextField!
     @IBOutlet var descriptionTextView: UITextView!
-    
-    
-    
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        var someTags = Tagpoint.addUser(representation: <#T##AnyObject#>)
-        
-        
+
         tagsTableviewLauncher.tableView.delegate = self
+        tagsTableviewLauncher.tableView.separatorStyle = .none
         NotificationCenter.default.addObserver(self, selector: #selector(enableSeekTime), name: Notification.Name("SeekToTime"), object: nil)
         
-        if let subs = UserDefaults.standard.array(forKey: "subscription") as? [[String: AnyObject]] {
-            tagPoints = subs as [[String : AnyObject]]
-        }
-        startBtnLabel.isEnabled = true
-        endBtnLabel.isEnabled = false
+        loadSavedTagpoints()
+        
+//        startBtnLabel.isEnabled = true
+//        endBtnLabel.isEnabled = false
+        disAndEnableButton(button: startBtnLabel, disable: false)
+        disAndEnableButton(button: endBtnLabel, disable: true)
+        
         makeAllViewButtons()
         makeNavTitleViewWithImage()
         tagsTableviewLauncher.handleShow(withDelay: 0.5)
         makeLeftBarButtonItem()
-        
         setUpTextViewAndField()
         
     }
 
     @IBAction func startTime(_ sender: AnyObject) {
         beginTimeWasSet = true
-        endBtnLabel.isEnabled = true
+        //endBtnLabel.isEnabled = true
+        disAndEnableButton(button: endBtnLabel, disable: false)
+        
         videoView.handlePause()
         videoView.startTimeSet = true
         videoView.startPointView.isHidden = false
@@ -94,8 +91,11 @@ class ViewController: UIViewController {
     }
     
     @IBAction func resetTimes(_ sender: AnyObject) {
-        startBtnLabel.isEnabled = true
-        endBtnLabel.isEnabled = false
+//        startBtnLabel.isEnabled = true
+//        endBtnLabel.isEnabled = false
+        disAndEnableButton(button: startBtnLabel, disable: false)
+        disAndEnableButton(button: endBtnLabel, disable: true)
+        
         endTimeWasSet = false
         beginTimeWasSet = false
         titleTextField.text = nil
@@ -103,22 +103,40 @@ class ViewController: UIViewController {
         NotificationCenter.default.post(name: Notification.Name("WasReset"), object: nil)
     }
     
+    func loadSavedTagpoints() {
+        if let subs = UserDefaults.standard.array(forKey: "subscription") as? [[String: AnyObject]] {
+            let tagpoints = subs as [[String : AnyObject]]
+            let sortedTagpoints = tagpoints.sorted {
+                item1, item2 in
+                let time1 = item1["begMult"] as! Double
+                let time2 = item2["begMult"] as! Double
+                return time1 < time2
+            }
+            tagPoints = sortedTagpoints
+        }
+    }
+    
+    func saveTagpointsAndReloadTableView() {
+        tagsTableviewLauncher.tagpoints = tagPoints
+        UserDefaults.standard.set(tagPoints, forKey: "subscription")
+        tagsTableviewLauncher.tableView.reloadData()
+    }
+    
     
     @IBAction func subMitTagPoint(_ sender: AnyObject) {
-        print(isInEditMode)
-        
+        setSelectedTableViewCellToDeselected()
         if isInEditMode {
-            print("Is in deitingmode")
-            if let selectedCell = selectedCellIndexpath {
-                var tagpoint = tagPoints[selectedCell]
+            if let index = tagsTableviewLauncher.tableView.indexPathForSelectedRow {
+                tagsTableviewLauncher.tableView.deselectRow(at: index, animated: true)
+                var tagpoint = tagPoints[index.row]
                 tagpoint["title"] = titleTextField.text as AnyObject?
                 tagpoint["comment"] = descriptionTextView.text as AnyObject?
-                tagPoints[selectedCell] = tagpoint
-                
-                reloadTableView()
+                tagPoints[index.row] = tagpoint
+                saveTagpointsAndReloadTableView()
+                loadSavedTagpoints()
+                videoView.createAllTagpointIndicatorViewsAboveVideo()
                 clearAllInputFiels()
                 isInEditMode = false
-
             }
             
         } else if titleTextField.text != "" && descriptionTextView.text != "" && beginTimeWasSet && endTimeWasSet  {
@@ -127,12 +145,15 @@ class ViewController: UIViewController {
             guard let ep = endPoint else { return }
             
             let tagPoint: [String: AnyObject] = ["title": title as AnyObject, "comment": comment as AnyObject, "beginTime": beginTime as AnyObject, "endTime": endTime as AnyObject, "begMult": sp as AnyObject,"endMult": ep as AnyObject]
+           
             
             tagPoints.append(tagPoint as [String : AnyObject])
-            startBtnLabel.isEnabled = true
-            endBtnLabel.isEnabled = false
+//            startBtnLabel.isEnabled = true
+//            endBtnLabel.isEnabled = false
+            disAndEnableButton(button: startBtnLabel, disable: false)
+            disAndEnableButton(button: endBtnLabel, disable: true)
             
-            reloadTableView()
+            saveTagpointsAndReloadTableView()
             
             videoView.startPointView.isHidden = true
             videoView.endPointView.isHidden = true
@@ -140,11 +161,11 @@ class ViewController: UIViewController {
             videoView.startTimeSet = false
             clearAllInputFiels()
             
-            videoView.addEndGhostView()
-            videoView.addBeginGhostView()
+            loadSavedTagpoints()
+            videoView.createAllTagpointIndicatorViewsAboveVideo()
             
             beginTimeWasSet = false
-            endTimeWasSet = true
+            endTimeWasSet = false
             
             } else {
                 let alert = UIAlertController(title: "Not complete", message: "Please fill in a title and a comment and be sure to select a begin- and endpoint for the fragment.", preferredStyle: .alert)
@@ -160,19 +181,30 @@ class ViewController: UIViewController {
         
     }
     
-    func reloadTableView() {
-        tagsTableviewLauncher.tagpoints = tagPoints
-        UserDefaults.standard.set(tagPoints, forKey: "subscription")
-        tagsTableviewLauncher.tableView.reloadData()
-    }
-    
     
     @IBAction func createNewTag(_ sender: AnyObject) {
         clearAllInputFiels()
         switchToEditingMode(self)
+//        startBtnLabel.isEnabled = true
+//        endBtnLabel.isEnabled = false
+        disAndEnableButton(button: startBtnLabel, disable: false)
+        disAndEnableButton(button: endBtnLabel, disable: true)
+        
         isInEditMode = false
+        setSelectedTableViewCellToDeselected()
+        
+        
+    }
+    
+    @IBAction func switchToEditingMode(_ sender: AnyObject) {
+        titleTextField.isUserInteractionEnabled = true
+        descriptionTextView.isUserInteractionEnabled = true
+        
+        
+    }
+    //Helper func to set selected cell-layout to deselcted
+    func setSelectedTableViewCellToDeselected() {
         if let index = tagsTableviewLauncher.tableView.indexPathForSelectedRow {
-            tagsTableviewLauncher.tableView.deselectRow(at: index, animated: true)
             if let selectedCell: TagpointTableCell = tagsTableviewLauncher.tableView.cellForRow(at: index) as! TagpointTableCell? {
                 selectedCell.titleLabel.backgroundColor = UIColor(red: 203/255, green: 246/255, blue: 255/255, alpha: 0.6)
                 selectedCell.titleLabel.textColor = .black
@@ -182,14 +214,16 @@ class ViewController: UIViewController {
                 selectedCell.beginTimeLabel.backgroundColor = .white
                 selectedCell.beginTimeLabel.textColor = .black
                 selectedCell.totalView.layer.borderWidth = 0.7
+                
+                let highlightedTag = videoView.titleTagDictArray[index.row]
+                let label = highlightedTag["label"] as! UILabel
+                label.textColor = .gray
+                label.layer.borderColor = UIColor.gray.cgColor
+                label.layer.borderWidth = 0.5
+                label.backgroundColor = .white
             }
-  
+            
         }
-    }
-    
-    @IBAction func switchToEditingMode(_ sender: AnyObject) {
-        titleTextField.isUserInteractionEnabled = true
-        descriptionTextView.isUserInteractionEnabled = true
     }
 
     
@@ -223,21 +257,17 @@ class ViewController: UIViewController {
         guard let newTagImg = UIImage(named: "newTag")?.withRenderingMode(.alwaysOriginal) else { return }
         newTagBtn.setImage(newTagImg, for: .normal)
     }
-    
-    func enableStartButton() {
-        startBtnLabel.isEnabled = true
-    }
-    
+
     func makeLeftBarButtonItem() {
         button = CustomLeftBarbutton()
-        button.addTarget(self, action: #selector(showAllTags), for: .touchUpInside)
+        button.addTarget(self, action: #selector(showAndHideAllTagsTableView), for: .touchUpInside)
         let rightBarButton = UIBarButtonItem()
         rightBarButton.customView = button
         navigationItem.leftBarButtonItem = rightBarButton
         
     }
     
-    func showAllTags() {
+    func showAndHideAllTagsTableView() {
         if !allTagsShown {
             button.setTitle("Hide", for: .normal)
             tagsTableviewLauncher.handleShow(withDelay: 0)
@@ -253,6 +283,17 @@ class ViewController: UIViewController {
         descriptionTextView.layer.cornerRadius = 12
         descriptionTextView.layer.borderWidth = 0.5
         descriptionTextView.layer.borderColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 0.5).cgColor
+    }
+    
+    func disAndEnableButton(button: UIButton, disable: Bool) {
+        switch disable {
+        case true:
+            button.isEnabled = false
+            button.alpha = 0.5
+        case false:
+            button.isEnabled = true
+            button.alpha = 1.0
+        }
     }
 }
 

@@ -10,7 +10,6 @@ import UIKit
 import AVFoundation
 
 class VideoView: UIView {
-    //somecomment
     
     var player: AVPlayer?
     var startTime: String = ""
@@ -23,18 +22,15 @@ class VideoView: UIView {
     var didSelectTagpoint: NSObject!
     var totalDuration: CMTime?
     var beginTimeSeekToFrame: Float64 = 10
+    var counter = 0
     
-    
+    var titleTagLabelArray: [UILabel] = []
+    var titleTagDictArray: [[String: AnyObject]] = []
+ 
     var viewController: ViewController?
     
     var tagpoints: [[String : AnyObject]] = []
-    var tagPoint: [String:AnyObject] = [:] {
-        didSet {
-            print("tagpoint is \(tagPoint)")
-            
-            
-        }
-    }
+    var tagPoint: [String:AnyObject] = [:]
     
     lazy var videoLengthSlider: UISlider = {
         let sl = UISlider()
@@ -53,12 +49,10 @@ class VideoView: UIView {
             let currentVideoTime = Float64(videoLengthSlider.value) * totalSeconds
             let seekTime = CMTime(value: Int64(currentVideoTime), timescale: 1)
             player?.seek(to: seekTime, completionHandler: { (completedSeek) in
-                //do something
             })
         }
     }
     
-
     let controlsContainerView: UIView = {
        let cc = UIView()
         cc.backgroundColor = UIColor(white: 0, alpha: 1)
@@ -118,20 +112,32 @@ class VideoView: UIView {
         return stpv
     }()
     
+    
     func setDictWithTouchedRow(beginTime: Double, endTime: Double) {
         let dict = ["bt": beginTime, "et": endTime]
-        print("dict in touchedrow\(dict)")
         NotificationCenter.default.post(name: Notification.Name("SeekToTime"), object: dict)
 
     }
     
+    func loadSavedTagpoints(completion: () -> Void) {
+        if let subs = UserDefaults.standard.array(forKey: "subscription") as? [[String: AnyObject]] {
+            var tagpoints = subs as [[String : AnyObject]]
+            let sortedTagpoints = tagpoints.sorted {
+                item1, item2 in
+                let time1 = item1["begMult"] as! Double
+                let time2 = item2["begMult"] as! Double
+                return time1 < time2
+            }
+            tagpoints = sortedTagpoints
+            completion()
+        }
+    }
+    
     func seekToSpecificTimeFrame(notification: NSNotification) {
-        print(notification.object)
         
         if let myDict = notification.object as? [String: AnyObject] {
             if let beginTime = myDict["bt"] as? Double {
                 let bt = Float64(beginTime)
-                print(bt)
                 let seekTime = CMTime(value: Int64(bt), timescale: 1)
                 player?.seek(to: seekTime, completionHandler: { (completedSeek) in
                     if self.player != nil {
@@ -143,46 +149,106 @@ class VideoView: UIView {
             }
         }
     }
+
+    var labelWidthAnchor = NSLayoutConstraint()
+    var labelHeightAnchor = NSLayoutConstraint()
     
-    func addBeginGhostView() {
-        setUpGhostViewWithColor(key: "begMult", color: .red, text: "S")
-        
-    }
-    
-    func addEndGhostView() {
-        setUpGhostViewWithColor(key: "endMult", color: .purple, text: "E")
-    }
-    
-    func setUpGhostViewWithColor(key: String, color: UIColor, text: String) {
+//    Creates tagpointviews above video of all tagpoints currently set by the user. It's called at loading the app and also after an edit of
+//    existing tag or when a new tag was added. Everytime its called it creates all tagviews from scratch (it removes al previous views).
+//    It sets the leftanchors position based on the begMult, a value of the dict
+//    It makes an array of dicts to save and sort the created labels on begintime.
+    func createAllTagpointIndicatorViewsAboveVideo() {
+        counter = 0
         if let subs = UserDefaults.standard.array(forKey: "subscription") as? [[String: AnyObject]] {
             let tagPoints = subs as [[String : AnyObject]]
+            let sortedTagpoints = tagPoints.sorted {
+                item1, item2 in
+                let time1 = item1["begMult"] as! Double
+                let time2 = item2["begMult"] as! Double
+                return time1 < time2
+            }
+            tagpoints = sortedTagpoints
             
-            for tagPoint in tagPoints {
-                print("tagponits in addGhost \(tagPoint)")
-                let begMult = tagPoint[key] as! CGFloat
-                print(key)
+            for view in tagPointsContainerView.subviews {
+                view.removeFromSuperview()
+            }
+            titleTagDictArray.removeAll()
+            
+            for tagPoint in tagpoints {
+                let begMult = tagPoint["begMult"] as! CGFloat
+                let tagName = tagPoint["title"] as! String
                 
-                let stpv = UILabel()
-                stpv.backgroundColor = color
-                stpv.alpha = 0.7
-                stpv.textAlignment = .center
-                stpv.font = UIFont.boldSystemFont(ofSize: 8)
-                stpv.text = text
-                stpv.textColor = .white
-                stpv.layer.cornerRadius = 6
-                stpv.layer.masksToBounds = true
-                stpv.translatesAutoresizingMaskIntoConstraints = false
-                
+                if counter <= 5 {
+                    counter += 1
+                } else {
+                    counter = 1
+                }
+                var heightOfLineView: CGFloat = 0
+                switch counter {
+                    case 1:
+                       heightOfLineView = 10
+                    case 2:
+                        heightOfLineView = 20
+                    case 3:
+                        heightOfLineView = 30
+                    case 4:
+                        heightOfLineView = 40
+                    case 5:
+                        heightOfLineView = 50
+                    default:
+                        break
+                }
                 let constant = controlsContainerView.frame.width * begMult
-                print("constant is \(constant)")
                 
-                tagPointsContainerView.addSubview(stpv)
-                stpv.leftAnchor.constraint(equalTo: tagPointsContainerView.leftAnchor, constant: constant).isActive = true
-                stpv.centerYAnchor.constraint(equalTo: tagPointsContainerView.centerYAnchor).isActive = true
-                stpv.widthAnchor.constraint(equalToConstant: 12).isActive = true
-                stpv.heightAnchor.constraint(equalToConstant: 12).isActive = true
+                let lineView = UIView()
+                lineView.backgroundColor = .gray
+                lineView.alpha = 0.7
+                lineView.translatesAutoresizingMaskIntoConstraints = false
+                
+                tagPointsContainerView.addSubview(lineView)
+                lineView.leftAnchor.constraint(equalTo: tagPointsContainerView.leftAnchor, constant: constant).isActive = true
+                lineView.bottomAnchor.constraint(equalTo: tagPointsContainerView.topAnchor, constant: 3).isActive = true
+                lineView.widthAnchor.constraint(equalToConstant: 1).isActive = true
+                lineView.heightAnchor.constraint(equalToConstant: heightOfLineView).isActive = true
+                self.setNeedsDisplay()
+                
+                let label = UILabel()
+                label.backgroundColor = .white
+                label.layer.borderColor = UIColor.gray.cgColor
+                label.textColor = .gray
+                label.layer.borderWidth = 0.5
+                label.layer.cornerRadius = 3
+                label.alpha = 1.0
+                label.textAlignment = .center
+                label.font = UIFont.boldSystemFont(ofSize: 8)
+                label.textColor = .black
+                label.translatesAutoresizingMaskIntoConstraints = false
+                label.text = tagName
+
+                tagPointsContainerView.addSubview(label)
+                label.bottomAnchor.constraint(equalTo: tagPointsContainerView.topAnchor, constant: -heightOfLineView + 3).isActive = true
+                label.leftAnchor.constraint(equalTo: tagPointsContainerView.leftAnchor, constant: constant).isActive = true
+                
+                labelWidthAnchor = label.widthAnchor.constraint(equalToConstant: 80)
+                labelWidthAnchor.isActive = true
+                
+                labelHeightAnchor = label.heightAnchor.constraint(equalToConstant: 10)
+                labelHeightAnchor.isActive = true
+                
+                let titleTagDict = ["begin": begMult, "label": label] as [String : Any]
+                titleTagDictArray.append(titleTagDict as [String : AnyObject])
+                
                 self.setNeedsDisplay()
             }
+            
+            let tempDictArray = titleTagDictArray.sorted {
+                
+                item1, item2 in
+                let time1 = item1["begin"] as! Double
+                let time2 = item2["begin"] as! Double
+                return time1 < time2
+            }
+            titleTagDictArray = tempDictArray
         }
 
     }
@@ -203,14 +269,13 @@ class VideoView: UIView {
             trackTime()
 
     }
-    
+    // To check if the video was loaded
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "currentItem.loadedTimeRanges" {
             activityIndicatorView.stopAnimating()
             playPauseButton.isHidden = false
             controlsContainerView.backgroundColor = .clear
-            
-            
+         
         }
     }
     
@@ -235,14 +300,12 @@ class VideoView: UIView {
                 if self.startTimeSet == false {
                     self.startTime = "\(minuteString):\(secondsString)"
                     self.startTimeSeconds = Double(progressedSeconds)
-                    self.startMultiplier = Double(progressedSeconds / durationSeconds)
-                    print("sm is \(self.startMultiplier)")
+                    self.startMultiplier = Double(progressedSeconds / durationSeconds)  
                     
                 } else {
                     self.endTime = "\(minuteString):\(secondsString)"
                     self.endTimeSeconds = Double(progressedSeconds)
                     self.endMultiplier = Double(progressedSeconds / durationSeconds)
-                    print("em is \(self.endMultiplier)")
                     
                     
                 }
@@ -272,6 +335,7 @@ class VideoView: UIView {
         
     }
     
+    //called when reset button is pressed via notification. Removes last 2 tagpoints
     func removeBeginAndEndpoint() {
         endPointView.removeFromSuperview()
         startPointView.removeFromSuperview()
@@ -295,14 +359,29 @@ class VideoView: UIView {
         endPointView.widthAnchor.constraint(equalToConstant: 16).isActive = true
         endPointView.heightAnchor.constraint(equalToConstant: 16).isActive = true
     }
+    
+    func addStartView() {
+        controlsContainerView.addSubview(startPointView)
+        leftStartPointConstraint = startPointView.leftAnchor.constraint(equalTo: controlsContainerView.leftAnchor, constant: -20)
+        leftStartPointConstraint.isActive = true
+        startPointView.topAnchor.constraint(equalTo: controlsContainerView.bottomAnchor, constant: -8).isActive = true
+        startPointView.widthAnchor.constraint(equalToConstant: 16).isActive = true
+        startPointView.heightAnchor.constraint(equalToConstant: 16).isActive = true
+    }
+    func addEndView() {
+        controlsContainerView.addSubview(endPointView)
+        leftEndPointConstraint = endPointView.leftAnchor.constraint(equalTo: controlsContainerView.leftAnchor, constant: -20)
+        leftEndPointConstraint.isActive = true
+        endPointView.topAnchor.constraint(equalTo: controlsContainerView.bottomAnchor, constant: -8).isActive = true
+        endPointView.widthAnchor.constraint(equalToConstant: 16).isActive = true
+        endPointView.heightAnchor.constraint(equalToConstant: 16).isActive = true
+    }
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         if let subs = UserDefaults.standard.array(forKey: "subscription") as? [[String: AnyObject]] {
             tagpoints = subs as [[String : AnyObject]]
-            print("The videoView tagpoint are \(tagpoints)")
         }
-        
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -316,9 +395,7 @@ class VideoView: UIView {
     override func awakeFromNib() {
         NotificationCenter.default.addObserver(self, selector: #selector(removeBeginAndEndpoint), name: Notification.Name("WasReset"), object: nil)
         setUpPLayer()
-        for view in tagPointsContainerView.subviews {
-            view.removeFromSuperview()
-            }
+        
         
         self.addSubview(controlsContainerView)
         controlsContainerView.frame = CGRect(x: 0, y: 0, width: 640, height: 360)
@@ -346,12 +423,24 @@ class VideoView: UIView {
         videoLengthSlider.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
         videoLengthSlider.bottomAnchor.constraint(equalTo: controlsContainerView.bottomAnchor, constant: 3).isActive = true
         
-        addBeginGhostView()
-        addEndGhostView()
+        createAllTagpointIndicatorViewsAboveVideo()
     }
     
     override func layoutSubviews() {
         controlsContainerView.frame = self.bounds
     }
 
+}
+
+extension UILabel{
+    
+    func requiredWidth() -> CGFloat{
+        
+        let label: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: CGFloat.greatestFiniteMagnitude, height: self.frame.height))
+        label.numberOfLines = 1
+        label.font = self.font
+        label.text = self.text
+        label.sizeToFit()
+        return label.frame.height
+    }
 }
