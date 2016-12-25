@@ -22,6 +22,7 @@ class TagpointTableCell: UITableViewCell {
     
     let commentLabel: UITextView = {
         let tv = UITextView()
+        tv.isUserInteractionEnabled = false
         tv.isEditable = false
         tv.isSelectable = false
         tv.isScrollEnabled = false
@@ -96,7 +97,7 @@ class TagpointTableCell: UITableViewCell {
         totalView.addSubview(commentLabel)
         commentLabel.leftAnchor.constraint(equalTo: totalView.leftAnchor, constant: 4).isActive = true
         commentLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor).isActive = true
-        commentLabel.rightAnchor.constraint(equalTo: totalView.rightAnchor, constant: 8).isActive = true
+        commentLabel.rightAnchor.constraint(equalTo: totalView.rightAnchor, constant: 4).isActive = true
         commentLabel.heightAnchor.constraint(equalTo: totalView.heightAnchor).isActive = true
     }
 

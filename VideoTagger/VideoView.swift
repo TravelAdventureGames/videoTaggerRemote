@@ -133,22 +133,7 @@ class VideoView: UIView {
         }
     }
     
-    func seekToSpecificTimeFrame(notification: NSNotification) {
-        
-        if let myDict = notification.object as? [String: AnyObject] {
-            if let beginTime = myDict["bt"] as? Double {
-                let bt = Float64(beginTime)
-                let seekTime = CMTime(value: Int64(bt), timescale: 1)
-                player?.seek(to: seekTime, completionHandler: { (completedSeek) in
-                    if self.player != nil {
-                        self.player?.pause()
-                        let image = UIImage(named: "play")
-                        self.playPauseButton.setImage(image, for: .normal)
-                    }
-                })
-            }
-        }
-    }
+
 
     var labelWidthAnchor = NSLayoutConstraint()
     var labelHeightAnchor = NSLayoutConstraint()
@@ -255,6 +240,7 @@ class VideoView: UIView {
     
     func setUpPLayer() {
         let urlString = "https://firebasestorage.googleapis.com/v0/b/gameofchats-762ca.appspot.com/o/message_movies%2F12323439-9729-4941-BA07-2BAE970967C7.mov?alt=media&token=3e37a093-3bc8-410f-84d3-38332af9c726"
+        
         guard let url = URL(string: urlString) else { return }
             player = AVPlayer(url: url)
         
@@ -278,12 +264,36 @@ class VideoView: UIView {
          
         }
     }
+    func seekToSpecificTimeFrame(notification: NSNotification) {
+        
+        if let myDict = notification.object as? [String: AnyObject] {
+            
+            if let beginTime = myDict["bt"] as? Double {
+                print("The selected begintime on a row tap is \(beginTime)")
+                let bt = Float64(beginTime)
+                let seekTime = CMTime(value: Int64(bt), timescale: 1)
+                print("The seektime is \(seekTime)")
+                player?.seek(to: seekTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero, completionHandler: { (completedseek) in
+                    if self.player != nil {
+                        self.player?.pause()
+                        let image = UIImage(named: "play")
+                        self.playPauseButton.setImage(image, for: .normal)
+                        
+                        if let duration = self.player?.currentItem?.duration {
+                            let durationSeconds = CMTimeGetSeconds(duration)
+                            self.videoLengthSlider.value = Float(beginTime / durationSeconds)
+                        }
+                    }
+                })
+            }
+        }
+    }
     
     func trackTime() {
 
         NotificationCenter.default.addObserver(self, selector: #selector(finishedPlaying), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: player?.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.seekToSpecificTimeFrame), name: Notification.Name("SeekToTime"), object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(seekToSpecificTimeFrame), name: Notification.Name("SeekToTime"), object: nil)
         
         let interval = CMTime(value: 1, timescale: 20)
         player?.addPeriodicTimeObserver(forInterval: interval, queue: DispatchQueue.main, using: { (progressedTime) in
@@ -291,6 +301,7 @@ class VideoView: UIView {
             let progressedSeconds = CMTimeGetSeconds(progressedTime)
             let secondsString = String(format: "%02d", Int(progressedSeconds .truncatingRemainder(dividingBy: 60)))
             let minuteString =  String(format: "%02d", Int(progressedSeconds / 60))
+            
 
             if let duration = self.player?.currentItem?.duration {
 
@@ -348,31 +359,14 @@ class VideoView: UIView {
         controlsContainerView.addSubview(startPointView)
         leftStartPointConstraint = startPointView.leftAnchor.constraint(equalTo: controlsContainerView.leftAnchor, constant: -20)
         leftStartPointConstraint.isActive = true
-        startPointView.topAnchor.constraint(equalTo: controlsContainerView.bottomAnchor, constant: -8).isActive = true
+        startPointView.topAnchor.constraint(equalTo: controlsContainerView.bottomAnchor, constant: 0).isActive = true
         startPointView.widthAnchor.constraint(equalToConstant: 16).isActive = true
         startPointView.heightAnchor.constraint(equalToConstant: 16).isActive = true
         
         controlsContainerView.addSubview(endPointView)
         leftEndPointConstraint = endPointView.leftAnchor.constraint(equalTo: controlsContainerView.leftAnchor, constant: -20)
         leftEndPointConstraint.isActive = true
-        endPointView.topAnchor.constraint(equalTo: controlsContainerView.bottomAnchor, constant: -8).isActive = true
-        endPointView.widthAnchor.constraint(equalToConstant: 16).isActive = true
-        endPointView.heightAnchor.constraint(equalToConstant: 16).isActive = true
-    }
-    
-    func addStartView() {
-        controlsContainerView.addSubview(startPointView)
-        leftStartPointConstraint = startPointView.leftAnchor.constraint(equalTo: controlsContainerView.leftAnchor, constant: -20)
-        leftStartPointConstraint.isActive = true
-        startPointView.topAnchor.constraint(equalTo: controlsContainerView.bottomAnchor, constant: -8).isActive = true
-        startPointView.widthAnchor.constraint(equalToConstant: 16).isActive = true
-        startPointView.heightAnchor.constraint(equalToConstant: 16).isActive = true
-    }
-    func addEndView() {
-        controlsContainerView.addSubview(endPointView)
-        leftEndPointConstraint = endPointView.leftAnchor.constraint(equalTo: controlsContainerView.leftAnchor, constant: -20)
-        leftEndPointConstraint.isActive = true
-        endPointView.topAnchor.constraint(equalTo: controlsContainerView.bottomAnchor, constant: -8).isActive = true
+        endPointView.topAnchor.constraint(equalTo: controlsContainerView.bottomAnchor, constant: 0).isActive = true
         endPointView.widthAnchor.constraint(equalToConstant: 16).isActive = true
         endPointView.heightAnchor.constraint(equalToConstant: 16).isActive = true
     }
@@ -421,7 +415,7 @@ class VideoView: UIView {
         controlsContainerView.addSubview(videoLengthSlider)
         videoLengthSlider.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
         videoLengthSlider.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
-        videoLengthSlider.bottomAnchor.constraint(equalTo: controlsContainerView.bottomAnchor, constant: 3).isActive = true
+        videoLengthSlider.bottomAnchor.constraint(equalTo: controlsContainerView.bottomAnchor, constant: 4).isActive = true
         
         createAllTagpointIndicatorViewsAboveVideo()
     }

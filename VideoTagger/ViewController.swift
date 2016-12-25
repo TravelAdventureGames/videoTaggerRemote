@@ -30,6 +30,7 @@ class ViewController: UIViewController {
 
     @IBOutlet var videoView: VideoView!
     
+    @IBOutlet var removeBtn: StartEndButton!
     @IBOutlet var newTagBtn: UIButton!
     @IBOutlet var editBtn: UIButton!
     @IBOutlet var startBtnLabel: StartEndButton!
@@ -44,10 +45,9 @@ class ViewController: UIViewController {
 
         tagsTableviewLauncher.tableView.delegate = self
         tagsTableviewLauncher.tableView.separatorStyle = .none
-        NotificationCenter.default.addObserver(self, selector: #selector(enableSeekTime), name: Notification.Name("SeekToTime"), object: nil)
         
         loadSavedTagpoints()
-        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel], dissAble: [false, true])
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel, editBtn, newTagBtn, removeBtn], dissAble: [false, true, true, true, true, true])
         
         makeAllViewButtons()
         makeNavTitleViewWithImage()
@@ -59,7 +59,7 @@ class ViewController: UIViewController {
 
     @IBAction func startTime(_ sender: AnyObject) {
         beginTimeWasSet = true
-        disAndEnableMultipleButtons(buttons: [endBtnLabel, startBtnLabel], dissAble: [false, true])
+        disAndEnableMultipleButtons(buttons: [endBtnLabel, startBtnLabel, submitBtnLabel, resetButton], dissAble: [false, true, true, false])
         videoView.handlePause()
         videoView.startTimeSet = true
         videoView.startPointView.isHidden = false
@@ -72,7 +72,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func endTime(_ sender: AnyObject) {
-        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel], dissAble: [true, true])
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel], dissAble: [true, true, false])
         endTimeWasSet = true
         videoView.handlePause()
         videoView.endPointView.isHidden = false
@@ -85,15 +85,6 @@ class ViewController: UIViewController {
         
     }
     
-    @IBAction func resetTimes(_ sender: AnyObject) {
-        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel], dissAble: [false, true])
-        endTimeWasSet = false
-        beginTimeWasSet = false
-        titleTextField.text = nil
-        descriptionTextView.text = nil
-        NotificationCenter.default.post(name: Notification.Name("WasReset"), object: nil)
-    }
-    
     func loadSavedTagpoints() {
         if let subs = UserDefaults.standard.array(forKey: "subscription") as? [[String: AnyObject]] {
             let tagpoints = subs as [[String : AnyObject]]
@@ -104,20 +95,22 @@ class ViewController: UIViewController {
                 return time1 < time2
             }
             tagPoints = sortedTagpoints
+            tagsTableviewLauncher.tagpoints = sortedTagpoints
+            videoView.tagpoints = tagPoints
+            tagsTableviewLauncher.tableView.reloadData()
+            videoView.createAllTagpointIndicatorViewsAboveVideo()
         }
     }
     
-    func saveTagpointsAndReloadTableView() {
-        tagsTableviewLauncher.tagpoints = tagPoints
-        videoView.tagpoints = tagPoints
+    func saveTagpointsToDefaults() {
         UserDefaults.standard.set(tagPoints, forKey: "subscription")
-        tagsTableviewLauncher.tableView.reloadData()
     }
     
     
     @IBAction func subMitTagPoint(_ sender: AnyObject) {
+        NotificationCenter.default.addObserver(self, selector: #selector(enableSeekTime), name: Notification.Name("SeekToTime"), object: nil)
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel, editBtn], dissAble: [false, true, true, true])
         setSelectedTableViewCellToDeselected()
-        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel], dissAble: [false, true])
         if isInEditMode {
             if let index = tagsTableviewLauncher.tableView.indexPathForSelectedRow {
                 tagsTableviewLauncher.tableView.deselectRow(at: index, animated: true)
@@ -125,11 +118,13 @@ class ViewController: UIViewController {
                 tagpoint["title"] = titleTextField.text as AnyObject?
                 tagpoint["comment"] = descriptionTextView.text as AnyObject?
                 tagPoints[index.row] = tagpoint
-                saveTagpointsAndReloadTableView()
+                
+                saveTagpointsToDefaults()
                 loadSavedTagpoints()
-                videoView.createAllTagpointIndicatorViewsAboveVideo()
+                
                 clearAllInputFiels()
                 isInEditMode = false
+                tagsTableviewLauncher.tableView.deselectRow(at: index, animated: true)
             }
             
         } else if titleTextField.text != "" && descriptionTextView.text != "" && beginTimeWasSet && endTimeWasSet  {
@@ -142,16 +137,14 @@ class ViewController: UIViewController {
             
             tagPoints.append(tagPoint as [String : AnyObject])
             
-            saveTagpointsAndReloadTableView()
+            saveTagpointsToDefaults()
+            loadSavedTagpoints()
             
             videoView.startPointView.isHidden = true
             videoView.endPointView.isHidden = true
             
             videoView.startTimeSet = false
             clearAllInputFiels()
-            
-            loadSavedTagpoints()
-            videoView.createAllTagpointIndicatorViewsAboveVideo()
             
             beginTimeWasSet = false
             endTimeWasSet = false
@@ -164,29 +157,46 @@ class ViewController: UIViewController {
             }
   
     }
+    
     func clearAllInputFiels() {
         titleTextField.text = nil
         descriptionTextView.text = nil
         
     }
-    
-    
     @IBAction func createNewTag(_ sender: AnyObject) {
+        setSelectedTableViewCellToDeselected()
         clearAllInputFiels()
         switchToEditingMode(self)
-        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel], dissAble: [false, true])
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel, resetButton, newTagBtn], dissAble: [false, true, true, false, true])
         isInEditMode = false
-        setSelectedTableViewCellToDeselected()
-        
-        
     }
     
+    @IBAction func removeTagWithButton(_ sender: AnyObject) {
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, resetButton, editBtn, removeBtn], dissAble: [false,true, false, true, true])
+        if let index = tagsTableviewLauncher.tableView.indexPathForSelectedRow {
+            setSelectedTableViewCellToDeselected()
+            tagPoints.remove(at: index.row)
+            saveTagpointsToDefaults()
+            loadSavedTagpoints()
+            clearAllInputFiels()
+        }
+    }
+    
+    @IBAction func resetTimes(_ sender: AnyObject) {
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel, editBtn, removeBtn], dissAble: [false, true, false, true, true])
+        endTimeWasSet = false
+        beginTimeWasSet = false
+        videoView.startTimeSet = false
+        titleTextField.text = nil
+        descriptionTextView.text = nil
+        NotificationCenter.default.post(name: Notification.Name("WasReset"), object: nil)
+    }
+
     @IBAction func switchToEditingMode(_ sender: AnyObject) {
         titleTextField.isUserInteractionEnabled = true
         descriptionTextView.isUserInteractionEnabled = true
-        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel], dissAble: [true, true])
-        
-        
+        isInEditMode = true
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel], dissAble: [true, true, false, false])
     }
     //Helper func to set selected cell-layout to deselcted
     func setSelectedTableViewCellToDeselected() {
@@ -212,7 +222,6 @@ class ViewController: UIViewController {
         }
     }
 
-    
     func estimateSizeOfCommentTextView(text: String) -> CGRect {
         let size = CGSize(width: 200, height: 1000)
         let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
@@ -237,11 +246,10 @@ class ViewController: UIViewController {
         submitBtnLabel.setTitle("Save", for: .normal)
         resetButton.setTitle("Reset", for: .normal)
         endBtnLabel.setTitle("Add end", for: .normal)
-        guard let editImage = UIImage(named: "edit2")?.withRenderingMode(.alwaysOriginal) else { return }
-        editBtn.setImage(editImage, for: .normal)
-        editBtn.isHidden = true
-        guard let newTagImg = UIImage(named: "newTag")?.withRenderingMode(.alwaysOriginal) else { return }
-        newTagBtn.setImage(newTagImg, for: .normal)
+        editBtn.setTitle("Edit", for: .normal)
+        newTagBtn.setTitle("New tag", for: .normal)
+        removeBtn.setTitle("Delete", for: .normal)
+        
     }
 
     func makeLeftBarButtonItem() {
@@ -277,7 +285,7 @@ class ViewController: UIViewController {
             switch dissAble[index] {
             case true:
                 button.isEnabled = false
-                button.alpha = 0.5
+                button.alpha = 0.3
             case false:
                 button.isEnabled = true
                 button.alpha = 1.0

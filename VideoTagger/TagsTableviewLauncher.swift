@@ -25,11 +25,11 @@ class TagsTableviewLauncher: NSObject {
         if let window = UIApplication.shared.keyWindow {
             window.addSubview(tableView)
             
-            tableView.frame = CGRect(x: -tvWidth, y: 134, width: tvWidth, height: 618)
+            tableView.frame = CGRect(x: -tvWidth, y: 134, width: tvWidth, height: 626)
             
             UIView.animate(withDuration: 0.5, delay: withDelay, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
                 
-                self.tableView.frame = CGRect(x: 10, y: 134, width: self.tvWidth, height: 618)
+                self.tableView.frame = CGRect(x: 10, y: 134, width: self.tvWidth, height: 626)
                 }, completion: nil)
         }
     }
@@ -37,7 +37,7 @@ class TagsTableviewLauncher: NSObject {
     func handleDismiss() {
         
         UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
-            self.tableView.frame = CGRect(x: -self.tvWidth, y: 134, width: self.tvWidth, height: 618)
+            self.tableView.frame = CGRect(x: -self.tvWidth, y: 134, width: self.tvWidth, height: 626)
             }, completion: nil)
     }
 

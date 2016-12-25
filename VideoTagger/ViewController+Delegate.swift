@@ -12,6 +12,7 @@ extension ViewController: UITableViewDelegate {
     
     
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel, editBtn], dissAble: [false, true, true, true])
         if let selectedCell: TagpointTableCell = tableView.cellForRow(at: indexPath) as! TagpointTableCell? {
             let highlightedTag = videoView.titleTagDictArray[indexPath.row]
             let label = highlightedTag["label"] as! UILabel
@@ -37,7 +38,7 @@ extension ViewController: UITableViewDelegate {
         isInEditMode = true
         titleTextField.isUserInteractionEnabled = false
         descriptionTextView.isUserInteractionEnabled = false
-        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel], dissAble: [true, true])
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel, editBtn, resetButton, newTagBtn, removeBtn], dissAble: [true, true, true, false, true, false, false])
         
         
         if let selectedCell: TagpointTableCell = tableView.cellForRow(at: indexPath) as! TagpointTableCell? {
@@ -49,7 +50,6 @@ extension ViewController: UITableViewDelegate {
             label.layer.borderColor = UIColor.black.cgColor
             label.backgroundColor = .red
             label.layer.masksToBounds = true
-            //label.widthAnchor.constraint(equalToConstant: 140).isActive = true
             
             
             selectedCell.selectionStyle = .none
@@ -84,7 +84,7 @@ extension ViewController: UITableViewDelegate {
         let tagpoint = tagPoints[indexPath.row]
         let comment = tagpoint["comment"] as! String
         height = estimateSizeOfCommentTextView(text: comment).height
-        return height + 74
+        return height + 40
     }
 
 

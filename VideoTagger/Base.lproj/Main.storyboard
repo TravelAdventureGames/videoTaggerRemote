@@ -57,26 +57,34 @@
                                             <action selector="resetTimes:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Our-6g-dg9"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cyh-Wg-gyW">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Sqw-A1-oPR" customClass="StartEndButton" customModule="VideoTagger" customModuleProvider="target">
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="20" id="MTD-Z9-GCP"/>
-                                            <constraint firstAttribute="width" constant="20" id="ZxV-nH-DUj"/>
+                                            <constraint firstAttribute="width" constant="45" id="oY1-ho-UIg"/>
+                                            <constraint firstAttribute="height" constant="45" id="s84-on-aSc"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <connections>
+                                            <action selector="createNewTag:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Vc6-Jb-u9H"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cyh-Wg-gyW" customClass="StartEndButton" customModule="VideoTagger" customModuleProvider="target">
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="45" id="V2v-CO-qyY"/>
+                                            <constraint firstAttribute="width" constant="45" id="fgW-5h-5Uo"/>
                                         </constraints>
                                         <state key="normal" title="Button"/>
                                         <connections>
                                             <action selector="switchToEditingMode:" destination="BYZ-38-t0r" eventType="touchUpInside" id="hdQ-AT-bF9"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Sqw-A1-oPR">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nCu-Yy-mPl" customClass="StartEndButton" customModule="VideoTagger" customModuleProvider="target">
                                         <constraints>
-                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="20" id="A4g-2d-eez"/>
-                                            <constraint firstAttribute="height" constant="20" id="O9K-Hv-Xtk"/>
-                                            <constraint firstAttribute="width" constant="20" id="sVh-Jw-nuZ"/>
-                                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="20" id="umX-Ym-oiG"/>
+                                            <constraint firstAttribute="width" constant="45" id="R8b-HT-Lhh"/>
+                                            <constraint firstAttribute="height" constant="45" id="eD1-Ly-iMm"/>
                                         </constraints>
                                         <state key="normal" title="Button"/>
                                         <connections>
-                                            <action selector="createNewTag:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Vc6-Jb-u9H"/>
+                                            <action selector="removeTagWithButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="c2A-IA-adA"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -85,13 +93,17 @@
                                     <constraint firstItem="hpV-wp-nbR" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="top" constant="5" id="3qx-fC-3HH"/>
                                     <constraint firstItem="rjU-dk-C4W" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="top" constant="5" id="4Y8-JG-r6x"/>
                                     <constraint firstItem="2B1-yk-9rg" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="top" constant="5" id="A8Q-QH-wJX"/>
-                                    <constraint firstItem="cyh-Wg-gyW" firstAttribute="leading" secondItem="Sqw-A1-oPR" secondAttribute="trailing" constant="19" id="Qrd-2F-qIv"/>
-                                    <constraint firstAttribute="bottom" secondItem="cyh-Wg-gyW" secondAttribute="bottom" constant="18" id="Xkb-lo-hiX"/>
+                                    <constraint firstItem="cyh-Wg-gyW" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="top" constant="5" id="Ab0-BP-slw"/>
+                                    <constraint firstAttribute="trailing" secondItem="nCu-Yy-mPl" secondAttribute="trailing" id="Cm6-j5-YoC"/>
+                                    <constraint firstAttribute="bottom" secondItem="nCu-Yy-mPl" secondAttribute="bottom" constant="5" id="LUI-OX-4tw"/>
                                     <constraint firstAttribute="height" constant="55" id="YTU-Gt-Aia"/>
                                     <constraint firstItem="hpV-wp-nbR" firstAttribute="leading" secondItem="2B1-yk-9rg" secondAttribute="trailing" constant="17" id="aDh-Fs-qAi"/>
+                                    <constraint firstItem="cyh-Wg-gyW" firstAttribute="leading" secondItem="Sqw-A1-oPR" secondAttribute="trailing" constant="17" id="b4T-VX-Qfe"/>
+                                    <constraint firstItem="nCu-Yy-mPl" firstAttribute="leading" secondItem="cyh-Wg-gyW" secondAttribute="trailing" constant="17" id="cuF-Za-eb0"/>
                                     <constraint firstItem="rjU-dk-C4W" firstAttribute="leading" secondItem="T86-aT-0X7" secondAttribute="leading" id="ewD-iS-hji"/>
-                                    <constraint firstItem="Sqw-A1-oPR" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="top" constant="17" id="ioP-Hs-DcQ"/>
                                     <constraint firstItem="2B1-yk-9rg" firstAttribute="leading" secondItem="rjU-dk-C4W" secondAttribute="trailing" constant="17" id="ppm-4g-20E"/>
+                                    <constraint firstItem="Sqw-A1-oPR" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="top" constant="5" id="qYb-kS-yB8"/>
+                                    <constraint firstItem="nCu-Yy-mPl" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="top" constant="5" id="z5E-AS-zD4"/>
                                 </constraints>
                             </view>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="A0T-Zr-0fa">
@@ -124,10 +136,10 @@
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="evi-fP-4Li" firstAttribute="leading" secondItem="A0T-Zr-0fa" secondAttribute="trailing" constant="23" id="2vz-Ws-IZM"/>
-                            <constraint firstItem="T86-aT-0X7" firstAttribute="top" secondItem="ZIH-wp-dKA" secondAttribute="bottom" constant="8" id="8ev-VB-l9R"/>
-                            <constraint firstItem="A0T-Zr-0fa" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="bottom" constant="8" id="CQd-ps-jAu"/>
-                            <constraint firstItem="evi-fP-4Li" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="bottom" constant="8" id="FVf-qA-9Vq"/>
+                            <constraint firstItem="evi-fP-4Li" firstAttribute="leading" secondItem="A0T-Zr-0fa" secondAttribute="trailing" constant="15" id="1jr-af-7r4"/>
+                            <constraint firstItem="T86-aT-0X7" firstAttribute="top" secondItem="ZIH-wp-dKA" secondAttribute="bottom" constant="16" id="8ev-VB-l9R"/>
+                            <constraint firstItem="A0T-Zr-0fa" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="bottom" constant="16" id="CQd-ps-jAu"/>
+                            <constraint firstItem="evi-fP-4Li" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="bottom" constant="16" id="FVf-qA-9Vq"/>
                             <constraint firstItem="T86-aT-0X7" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="MF2-Pm-tNq"/>
                             <constraint firstItem="1KY-4F-EfL" firstAttribute="width" secondItem="ZIH-wp-dKA" secondAttribute="width" id="MeG-Io-va6"/>
                             <constraint firstItem="1KY-4F-EfL" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="OjB-vm-OvZ"/>
@@ -136,7 +148,6 @@
                             <constraint firstItem="T86-aT-0X7" firstAttribute="width" secondItem="ZIH-wp-dKA" secondAttribute="width" id="eMM-Qo-k5o"/>
                             <constraint firstItem="1KY-4F-EfL" firstAttribute="top" secondItem="A0T-Zr-0fa" secondAttribute="bottom" constant="8" id="gqn-lO-uGL"/>
                             <constraint firstItem="A0T-Zr-0fa" firstAttribute="leading" secondItem="rjU-dk-C4W" secondAttribute="leading" id="oAL-Xt-PPl"/>
-                            <constraint firstItem="cyh-Wg-gyW" firstAttribute="trailing" secondItem="A0T-Zr-0fa" secondAttribute="trailing" id="xXq-a5-Q1A"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="ah4-iU-b4z"/>
@@ -147,6 +158,7 @@
                         <outlet property="editBtn" destination="cyh-Wg-gyW" id="plO-5Q-JSO"/>
                         <outlet property="endBtnLabel" destination="2B1-yk-9rg" id="q6o-tm-57e"/>
                         <outlet property="newTagBtn" destination="Sqw-A1-oPR" id="5ac-4z-4wk"/>
+                        <outlet property="removeBtn" destination="nCu-Yy-mPl" id="GFQ-bf-x8Q"/>
                         <outlet property="resetButton" destination="hpV-wp-nbR" id="Lvl-ro-SY8"/>
                         <outlet property="startBtnLabel" destination="rjU-dk-C4W" id="axH-Ft-Dep"/>
                         <outlet property="submitBtnLabel" destination="evi-fP-4Li" id="WIs-cT-44Z"/>
@@ -156,7 +168,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1274" y="-110"/>
+            <point key="canvasLocation" x="1273.5999999999999" y="-110.64467766116942"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="c9B-Dp-CpS">

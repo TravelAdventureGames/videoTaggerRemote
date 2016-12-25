@@ -33,19 +33,4 @@ class Tagpoint: NSObject {
         }
     }
 }
-    
-//    static func addUser(representation: AnyObject) -> [Tagpoint] {
-//        var tagpoints: [Tagpoint] = []
-//        if let data = ((representation as! [String: AnyObject]).value(forKey: "subscription") as? [NSDictionary]) {
-//            if let someData = data as? [[String: AnyObject]] {
-//                for dt in someData {
-//                    if let tagPoint = Tagpoint(representation: dt as AnyObject) {
-//                        tagpoints.append(tagPoint)
-//                    }
-//                }
-//            }
-//        }
-//        return tagpoints
-//    }
-//
-//}
+
