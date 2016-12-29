@@ -3,6 +3,8 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -19,10 +21,8 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZIH-wp-dKA" customClass="VideoView" customModule="VideoTagger" customModuleProvider="target">
-                                <color key="backgroundColor" red="0.79676470756066409" green="0.96581720420548345" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="640" id="ih9-vB-b1x"/>
-                                    <constraint firstAttribute="height" constant="360" id="sYf-vN-8LH"/>
+                                    <constraint firstAttribute="width" secondItem="ZIH-wp-dKA" secondAttribute="height" multiplier="16:9" id="23q-2H-2LD"/>
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="T86-aT-0X7">
@@ -87,22 +87,48 @@
                                             <action selector="removeTagWithButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="c2A-IA-adA"/>
                                         </connections>
                                     </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hu6-kf-VOl" customClass="StartEndButton" customModule="VideoTagger" customModuleProvider="target">
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="45" id="DcA-19-6wj"/>
+                                            <constraint firstAttribute="width" constant="45" id="VzZ-vt-tPr"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <connections>
+                                            <action selector="switchFullScreenModus:" destination="BYZ-38-t0r" eventType="touchUpInside" id="CIT-9q-n8S"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="O8r-Dt-fmu" customClass="StartEndButton" customModule="VideoTagger" customModuleProvider="target">
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="46" id="hcR-G0-X6V"/>
+                                            <constraint firstAttribute="height" constant="45" id="oqN-7p-GpK"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <connections>
+                                            <action selector="createDrawView:" destination="BYZ-38-t0r" eventType="touchUpInside" id="GaC-q5-jPa"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstItem="hpV-wp-nbR" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="top" constant="5" id="3qx-fC-3HH"/>
                                     <constraint firstItem="rjU-dk-C4W" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="top" constant="5" id="4Y8-JG-r6x"/>
                                     <constraint firstItem="2B1-yk-9rg" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="top" constant="5" id="A8Q-QH-wJX"/>
+                                    <constraint firstItem="O8r-Dt-fmu" firstAttribute="leading" secondItem="Hu6-kf-VOl" secondAttribute="trailing" constant="10.5" id="ALM-VX-7T7"/>
                                     <constraint firstItem="cyh-Wg-gyW" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="top" constant="5" id="Ab0-BP-slw"/>
+                                    <constraint firstItem="Hu6-kf-VOl" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="top" constant="5" id="B70-Y9-wT0"/>
                                     <constraint firstAttribute="trailing" secondItem="nCu-Yy-mPl" secondAttribute="trailing" id="Cm6-j5-YoC"/>
                                     <constraint firstAttribute="bottom" secondItem="nCu-Yy-mPl" secondAttribute="bottom" constant="5" id="LUI-OX-4tw"/>
                                     <constraint firstAttribute="height" constant="55" id="YTU-Gt-Aia"/>
                                     <constraint firstItem="hpV-wp-nbR" firstAttribute="leading" secondItem="2B1-yk-9rg" secondAttribute="trailing" constant="17" id="aDh-Fs-qAi"/>
                                     <constraint firstItem="cyh-Wg-gyW" firstAttribute="leading" secondItem="Sqw-A1-oPR" secondAttribute="trailing" constant="17" id="b4T-VX-Qfe"/>
                                     <constraint firstItem="nCu-Yy-mPl" firstAttribute="leading" secondItem="cyh-Wg-gyW" secondAttribute="trailing" constant="17" id="cuF-Za-eb0"/>
+                                    <constraint firstAttribute="bottom" secondItem="O8r-Dt-fmu" secondAttribute="bottom" constant="5" id="epO-h2-0wa"/>
                                     <constraint firstItem="rjU-dk-C4W" firstAttribute="leading" secondItem="T86-aT-0X7" secondAttribute="leading" id="ewD-iS-hji"/>
+                                    <constraint firstItem="O8r-Dt-fmu" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="top" constant="5" id="mfS-Dh-iKb"/>
                                     <constraint firstItem="2B1-yk-9rg" firstAttribute="leading" secondItem="rjU-dk-C4W" secondAttribute="trailing" constant="17" id="ppm-4g-20E"/>
                                     <constraint firstItem="Sqw-A1-oPR" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="top" constant="5" id="qYb-kS-yB8"/>
+                                    <constraint firstAttribute="bottom" secondItem="Hu6-kf-VOl" secondAttribute="bottom" constant="5" id="xGV-27-iJp"/>
+                                    <constraint firstItem="Hu6-kf-VOl" firstAttribute="centerX" secondItem="T86-aT-0X7" secondAttribute="centerX" id="yY6-Y5-JZq"/>
                                     <constraint firstItem="nCu-Yy-mPl" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="top" constant="5" id="z5E-AS-zD4"/>
                                 </constraints>
                             </view>
@@ -133,11 +159,19 @@
                                     <action selector="subMitTagPoint:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Oih-TZ-ayv"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hvz-Lv-aGq" customClass="StartEndButton" customModule="VideoTagger" customModuleProvider="target">
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="createTempDragView:" destination="BYZ-38-t0r" eventType="touchUpInside" id="aa9-Yy-YLA"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="evi-fP-4Li" firstAttribute="leading" secondItem="A0T-Zr-0fa" secondAttribute="trailing" constant="15" id="1jr-af-7r4"/>
+                            <constraint firstItem="ZIH-wp-dKA" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" multiplier="0.5" id="8bQ-dx-VrR"/>
                             <constraint firstItem="T86-aT-0X7" firstAttribute="top" secondItem="ZIH-wp-dKA" secondAttribute="bottom" constant="16" id="8ev-VB-l9R"/>
+                            <constraint firstItem="hvz-Lv-aGq" firstAttribute="leading" secondItem="evi-fP-4Li" secondAttribute="trailing" constant="31" id="CAM-3q-z1d"/>
                             <constraint firstItem="A0T-Zr-0fa" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="bottom" constant="16" id="CQd-ps-jAu"/>
                             <constraint firstItem="evi-fP-4Li" firstAttribute="top" secondItem="T86-aT-0X7" secondAttribute="bottom" constant="16" id="FVf-qA-9Vq"/>
                             <constraint firstItem="T86-aT-0X7" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="MF2-Pm-tNq"/>
@@ -145,6 +179,7 @@
                             <constraint firstItem="1KY-4F-EfL" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="OjB-vm-OvZ"/>
                             <constraint firstItem="ZIH-wp-dKA" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="70" id="TRv-uO-gQ7"/>
                             <constraint firstItem="ZIH-wp-dKA" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="X9h-9p-ZqI"/>
+                            <constraint firstItem="1KY-4F-EfL" firstAttribute="top" secondItem="hvz-Lv-aGq" secondAttribute="bottom" constant="9" id="dFC-l9-eRR"/>
                             <constraint firstItem="T86-aT-0X7" firstAttribute="width" secondItem="ZIH-wp-dKA" secondAttribute="width" id="eMM-Qo-k5o"/>
                             <constraint firstItem="1KY-4F-EfL" firstAttribute="top" secondItem="A0T-Zr-0fa" secondAttribute="bottom" constant="8" id="gqn-lO-uGL"/>
                             <constraint firstItem="A0T-Zr-0fa" firstAttribute="leading" secondItem="rjU-dk-C4W" secondAttribute="leading" id="oAL-Xt-PPl"/>
@@ -155,8 +190,10 @@
                     <size key="freeformSize" width="1024" height="768"/>
                     <connections>
                         <outlet property="descriptionTextView" destination="1KY-4F-EfL" id="Wx4-dp-Wyk"/>
+                        <outlet property="drawButton" destination="O8r-Dt-fmu" id="dal-IB-5ZT"/>
                         <outlet property="editBtn" destination="cyh-Wg-gyW" id="plO-5Q-JSO"/>
                         <outlet property="endBtnLabel" destination="2B1-yk-9rg" id="q6o-tm-57e"/>
+                        <outlet property="fullScreenBtn" destination="Hu6-kf-VOl" id="kwm-Vc-gLX"/>
                         <outlet property="newTagBtn" destination="Sqw-A1-oPR" id="5ac-4z-4wk"/>
                         <outlet property="removeBtn" destination="nCu-Yy-mPl" id="GFQ-bf-x8Q"/>
                         <outlet property="resetButton" destination="hpV-wp-nbR" id="Lvl-ro-SY8"/>
@@ -164,6 +201,7 @@
                         <outlet property="submitBtnLabel" destination="evi-fP-4Li" id="WIs-cT-44Z"/>
                         <outlet property="titleTextField" destination="A0T-Zr-0fa" id="mH7-at-xa9"/>
                         <outlet property="videoView" destination="ZIH-wp-dKA" id="gh0-yu-deD"/>
+                        <outlet property="videoViewWidthConstraint" destination="8bQ-dx-VrR" id="kei-UU-XAF"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

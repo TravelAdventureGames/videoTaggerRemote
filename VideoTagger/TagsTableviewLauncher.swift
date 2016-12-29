@@ -13,8 +13,10 @@ class TagsTableviewLauncher: NSObject {
     
     let cellId = "cellId"
     let videoView = VideoView()
-    let tvWidth: CGFloat = 340
+    let tvWidth: CGFloat = 320
     var tagpoints: [[String : AnyObject]] = []
+    
+    var lastSelectedRow: Int?
     
     let tableView: UITableView = {
         let tv = UITableView()
@@ -23,21 +25,23 @@ class TagsTableviewLauncher: NSObject {
     
     func handleShow(withDelay: TimeInterval ) {
         if let window = UIApplication.shared.keyWindow {
+            let width  = (window.frame.width * 0.25) - 20
             window.addSubview(tableView)
             
-            tableView.frame = CGRect(x: -tvWidth, y: 134, width: tvWidth, height: 626)
+            tableView.frame = CGRect(x: -width, y: 134, width: width, height: 626)
             
             UIView.animate(withDuration: 0.5, delay: withDelay, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
                 
-                self.tableView.frame = CGRect(x: 10, y: 134, width: self.tvWidth, height: 626)
+                self.tableView.frame = CGRect(x: 10, y: 134, width: width, height: 626)
                 }, completion: nil)
         }
     }
-    
+
     func handleDismiss() {
         
         UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
             self.tableView.frame = CGRect(x: -self.tvWidth, y: 134, width: self.tvWidth, height: 626)
+            
             }, completion: nil)
     }
 
@@ -58,6 +62,7 @@ class TagsTableviewLauncher: NSObject {
         }
         tableView.dataSource = self
         tableView.register(TagpointTableCell.self, forCellReuseIdentifier: cellId)
+        
         
     }
 }

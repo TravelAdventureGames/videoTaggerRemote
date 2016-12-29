@@ -24,12 +24,17 @@ class VideoView: UIView {
     var beginTimeSeekToFrame: Float64 = 10
     var counter = 0
     
+    var playerLayer = AVPlayerLayer()
+    
     var titleTagLabelArray: [UILabel] = []
     var titleTagDictArray: [[String: AnyObject]] = []
  
     var viewController: ViewController?
+    var tagsTableViewController: TagsTableviewLauncher?
     
     var tagpoints: [[String : AnyObject]] = []
+    var drawImage: UIImage?
+    
     var tagPoint: [String:AnyObject] = [:]
     
     lazy var videoLengthSlider: UISlider = {
@@ -59,6 +64,9 @@ class VideoView: UIView {
         return cc
         
     }()
+    
+    let drawView = DrawView()
+    let imageDrawView = UIImageView()
     
     let tagPointsContainerView: UIView = {
         let tv = UIView()
@@ -112,7 +120,11 @@ class VideoView: UIView {
         return stpv
     }()
     
-    
+    override func layoutSublayers(of layer: CALayer) {
+        playerLayer.frame = self.bounds
+        controlsContainerView.frame = self.bounds
+    }
+
     func setDictWithTouchedRow(beginTime: Double, endTime: Double) {
         let dict = ["bt": beginTime, "et": endTime]
         NotificationCenter.default.post(name: Notification.Name("SeekToTime"), object: dict)
@@ -129,19 +141,49 @@ class VideoView: UIView {
                 return time1 < time2
             }
             tagpoints = sortedTagpoints
-            
         }
     }
     
+    func createAndStoreImageFromDrawing() {
+        let renderer = UIGraphicsImageRenderer(size: drawView.bounds.size)
+        let image = renderer.image { ctx in
+            drawView.drawHierarchy(in: drawView.bounds, afterScreenUpdates: true)
+            }
+        drawImage = image
+    }
+    
+    
+    func createDrawView() {
+        drawView.lines? = []
+        drawView.frame = self.bounds
+        drawView.backgroundColor = .clear
+        addSubview(drawView)
+        drawView.setNeedsDisplay()
+        
+    }
 
+    func removeDrawView() {
+        drawView.lines?.removeAll()
+        drawView.removeFromSuperview()
+        setNeedsDisplay()
+    }
+    
+    func createDrawImageView() {
+        imageDrawView.frame = self.bounds
+        imageDrawView.backgroundColor = .clear
+        addSubview(imageDrawView)
+        imageDrawView.image = drawImage
+        imageDrawView.contentMode = .scaleAspectFill
+    }
+    func removeImageDrawView() {
+        imageDrawView.removeFromSuperview()
+        setNeedsDisplay()
+    }
 
     var labelWidthAnchor = NSLayoutConstraint()
     var labelHeightAnchor = NSLayoutConstraint()
     
-//    Creates tagpointviews above video of all tagpoints currently set by the user. It's called at loading the app and also after an edit of
-//    existing tag or when a new tag was added. Everytime its called it creates all tagviews from scratch (it removes al previous views).
-//    It sets the leftanchors position based on the begMult, a value of the dict
-//    It makes an array of dicts to save and sort the created labels on begintime.
+    
     func createAllTagpointIndicatorViewsAboveVideo() {
         counter = 0
         if let subs = UserDefaults.standard.array(forKey: "subscription") as? [[String: AnyObject]] {
@@ -153,22 +195,24 @@ class VideoView: UIView {
                 return time1 < time2
             }
             tagpoints = sortedTagpoints
-            
+        
             for view in tagPointsContainerView.subviews {
                 view.removeFromSuperview()
             }
             titleTagDictArray.removeAll()
+            var heightOfLineView: CGFloat = 0
             
             for tagPoint in tagpoints {
+
                 let begMult = tagPoint["begMult"] as! CGFloat
                 let tagName = tagPoint["title"] as! String
                 
-                if counter <= 5 {
+                if counter < 5 {
                     counter += 1
                 } else {
                     counter = 1
                 }
-                var heightOfLineView: CGFloat = 0
+                
                 switch counter {
                     case 1:
                        heightOfLineView = 10
@@ -183,7 +227,8 @@ class VideoView: UIView {
                     default:
                         break
                 }
-                let constant = controlsContainerView.frame.width * begMult
+
+                let constant = self.frame.width * begMult
                 
                 let lineView = UIView()
                 lineView.backgroundColor = .gray
@@ -191,7 +236,7 @@ class VideoView: UIView {
                 lineView.translatesAutoresizingMaskIntoConstraints = false
                 
                 tagPointsContainerView.addSubview(lineView)
-                lineView.leftAnchor.constraint(equalTo: tagPointsContainerView.leftAnchor, constant: constant).isActive = true
+                lineView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: constant).isActive = true
                 lineView.bottomAnchor.constraint(equalTo: tagPointsContainerView.topAnchor, constant: 3).isActive = true
                 lineView.widthAnchor.constraint(equalToConstant: 1).isActive = true
                 lineView.heightAnchor.constraint(equalToConstant: heightOfLineView).isActive = true
@@ -212,7 +257,7 @@ class VideoView: UIView {
 
                 tagPointsContainerView.addSubview(label)
                 label.bottomAnchor.constraint(equalTo: tagPointsContainerView.topAnchor, constant: -heightOfLineView + 3).isActive = true
-                label.leftAnchor.constraint(equalTo: tagPointsContainerView.leftAnchor, constant: constant).isActive = true
+                label.leftAnchor.constraint(equalTo: self.leftAnchor, constant: constant).isActive = true
                 
                 labelWidthAnchor = label.widthAnchor.constraint(equalToConstant: 80)
                 labelWidthAnchor.isActive = true
@@ -234,22 +279,28 @@ class VideoView: UIView {
                 return time1 < time2
             }
             titleTagDictArray = tempDictArray
+            
+//            if let index = tagsTableViewController?.tableView.indexPathForSelectedRow {
+//                let lbl = titleTagDictArray[index.row]
+//                let myLabel = lbl["label"] as! UILabel
+//                myLabel.backgroundColor = .red
+//                myLabel.textColor = .white
+//            
+//            }
         }
 
     }
     
     func setUpPLayer() {
-        let urlString = "https://firebasestorage.googleapis.com/v0/b/gameofchats-762ca.appspot.com/o/message_movies%2F12323439-9729-4941-BA07-2BAE970967C7.mov?alt=media&token=3e37a093-3bc8-410f-84d3-38332af9c726"
+        let urlString = "https://firebasestorage.googleapis.com/v0/b/videotrack-83e0d.appspot.com/o/lego.mov?alt=media&token=84f70a09-11d0-4406-bdfb-a8201ac54cb9"//"https://firebasestorage.googleapis.com/v0/b/gameofchats-762ca.appspot.com/o/message_movies%2F12323439-9729-4941-BA07-2BAE970967C7.mov?alt=media&token=3e37a093-3bc8-410f-84d3-38332af9c726"
         
         guard let url = URL(string: urlString) else { return }
             player = AVPlayer(url: url)
         
-            let playerLayer = AVPlayerLayer(player: player)
+            playerLayer = AVPlayerLayer(player: player)
             self.layer.addSublayer(playerLayer)
-//            playerLayer.bounds = controlsContainerView.layer.bounds
-//            playerLayer.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)
         
-            playerLayer.frame = CGRect(x: 0, y: 0, width: 640, height: 360)
+            //playerLayer.frame = CGRect(x: 0, y: 0, width: 640, height: 360)
             player?.addObserver(self, forKeyPath: "currentItem.loadedTimeRanges", options: .new, context: nil)
             player?.pause()
             trackTime()
@@ -261,6 +312,7 @@ class VideoView: UIView {
             activityIndicatorView.stopAnimating()
             playPauseButton.isHidden = false
             controlsContainerView.backgroundColor = .clear
+            
          
         }
     }
@@ -317,11 +369,9 @@ class VideoView: UIView {
                     self.endTime = "\(minuteString):\(secondsString)"
                     self.endTimeSeconds = Double(progressedSeconds)
                     self.endMultiplier = Double(progressedSeconds / durationSeconds)
-                    
-                    
+   
                 }
             }
-
         })
     }
     
@@ -375,7 +425,7 @@ class VideoView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         loadSavedTagpoints()
-    
+
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -389,7 +439,6 @@ class VideoView: UIView {
     override func awakeFromNib() {
         NotificationCenter.default.addObserver(self, selector: #selector(removeBeginAndEndpoint), name: Notification.Name("WasReset"), object: nil)
         setUpPLayer()
-        
         
         self.addSubview(controlsContainerView)
         controlsContainerView.frame = CGRect(x: 0, y: 0, width: 640, height: 360)
@@ -422,6 +471,8 @@ class VideoView: UIView {
     
     override func layoutSubviews() {
         controlsContainerView.frame = self.bounds
+        self.frame = self.frame
+        drawView.frame = self.bounds
     }
 
 }

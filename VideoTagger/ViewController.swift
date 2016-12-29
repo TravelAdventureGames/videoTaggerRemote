@@ -10,7 +10,7 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    var tagPoints: [[String: AnyObject]] = [] 
+    var tagPoints: [[String: AnyObject]] = []
     var allTagsShown = true
     var button = UIButton(type: .custom)
     var tagsTableviewLauncher = TagsTableviewLauncher()
@@ -22,14 +22,14 @@ class ViewController: UIViewController {
     
     var beginTimeWasSet = false
     var endTimeWasSet = false
+    var drawViewWasSet = false
     
     var isInEditMode = false
-    var selectedCellIndexpath: Int?
-    
-    var modelTagpoints: [Tagpoint]?
 
     @IBOutlet var videoView: VideoView!
     
+    @IBOutlet var drawButton: StartEndButton!
+    @IBOutlet var fullScreenBtn: StartEndButton!
     @IBOutlet var removeBtn: StartEndButton!
     @IBOutlet var newTagBtn: UIButton!
     @IBOutlet var editBtn: UIButton!
@@ -40,9 +40,15 @@ class ViewController: UIViewController {
     @IBOutlet var titleTextField: UITextField!
     @IBOutlet var descriptionTextView: UITextView!
 
+    @IBOutlet var videoViewWidthConstraint: NSLayoutConstraint!
+    var videoViewLrageWidthConstraint: NSLayoutConstraint?
+    var videoViewLsmallWidthConstraint: NSLayoutConstraint?
+
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        videoViewLrageWidthConstraint = videoView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.7)
+        videoViewLrageWidthConstraint?.isActive = false
+ 
         tagsTableviewLauncher.tableView.delegate = self
         tagsTableviewLauncher.tableView.separatorStyle = .none
         
@@ -55,6 +61,12 @@ class ViewController: UIViewController {
         makeLeftBarButtonItem()
         setUpTextViewAndField()
         
+    }
+    
+    override func viewDidLayoutSubviews() {
+        videoView.createAllTagpointIndicatorViewsAboveVideo()
+        videoView.drawView.frame = videoView.bounds
+        videoView.imageDrawView.frame = videoView.bounds
     }
 
     @IBAction func startTime(_ sender: AnyObject) {
@@ -96,7 +108,7 @@ class ViewController: UIViewController {
             }
             tagPoints = sortedTagpoints
             tagsTableviewLauncher.tagpoints = sortedTagpoints
-            videoView.tagpoints = tagPoints
+            videoView.tagpoints = sortedTagpoints
             tagsTableviewLauncher.tableView.reloadData()
             videoView.createAllTagpointIndicatorViewsAboveVideo()
         }
@@ -128,15 +140,20 @@ class ViewController: UIViewController {
             }
             
         } else if titleTextField.text != "" && descriptionTextView.text != "" && beginTimeWasSet && endTimeWasSet  {
+            videoView.createAndStoreImageFromDrawing()
             guard let title = titleTextField.text, let comment = descriptionTextView.text, let beginTime = startTime, let endTime = endTime else { return }
             guard let sp = startPoint else { return }
             guard let ep = endPoint else { return }
+            guard let img = videoView.drawImage else { return }
+            guard let imgData = UIImagePNGRepresentation(img) else { return }
             
-            let tagPoint: [String: AnyObject] = ["title": title as AnyObject, "comment": comment as AnyObject, "beginTime": beginTime as AnyObject, "endTime": endTime as AnyObject, "begMult": sp as AnyObject,"endMult": ep as AnyObject]
-           
+            let tagPoint: [String: AnyObject] = ["title": title as AnyObject, "comment": comment as AnyObject, "beginTime": beginTime as AnyObject, "endTime": endTime as AnyObject, "begMult": sp as AnyObject,"endMult": ep as AnyObject, "drawImg": imgData as AnyObject]
             
+            drawViewWasSet = true
+            videoView.removeDrawView()
+
             tagPoints.append(tagPoint as [String : AnyObject])
-            
+
             saveTagpointsToDefaults()
             loadSavedTagpoints()
             
@@ -155,14 +172,15 @@ class ViewController: UIViewController {
                 alert.addAction(action)
                 present(alert, animated: true, completion: nil)
             }
-  
     }
     
     func clearAllInputFiels() {
         titleTextField.text = nil
         descriptionTextView.text = nil
         
+        
     }
+
     @IBAction func createNewTag(_ sender: AnyObject) {
         setSelectedTableViewCellToDeselected()
         clearAllInputFiels()
@@ -172,7 +190,7 @@ class ViewController: UIViewController {
     }
     
     @IBAction func removeTagWithButton(_ sender: AnyObject) {
-        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, resetButton, editBtn, removeBtn], dissAble: [false,true, false, true, true])
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, resetButton, editBtn, removeBtn, newTagBtn], dissAble: [true,true, true, true, true, false])
         if let index = tagsTableviewLauncher.tableView.indexPathForSelectedRow {
             setSelectedTableViewCellToDeselected()
             tagPoints.remove(at: index.row)
@@ -190,6 +208,25 @@ class ViewController: UIViewController {
         titleTextField.text = nil
         descriptionTextView.text = nil
         NotificationCenter.default.post(name: Notification.Name("WasReset"), object: nil)
+    }
+    @IBAction func switchFullScreenModus(_ sender: AnyObject) {
+        showAndHideAllTagsTableView()
+        
+        if !allTagsShown {
+            videoView.translatesAutoresizingMaskIntoConstraints = false
+            videoViewWidthConstraint.isActive = false
+            videoViewLrageWidthConstraint?.isActive = true
+            
+        } else {
+            videoView.translatesAutoresizingMaskIntoConstraints = false
+            videoViewLrageWidthConstraint?.isActive = false
+            videoViewWidthConstraint.isActive = true
+        }
+    }
+    @IBAction func createDrawView(_ sender: AnyObject) {
+        drawViewWasSet = false
+        videoView.createDrawView()
+        
     }
 
     @IBAction func switchToEditingMode(_ sender: AnyObject) {
@@ -223,11 +260,10 @@ class ViewController: UIViewController {
     }
 
     func estimateSizeOfCommentTextView(text: String) -> CGRect {
-        let size = CGSize(width: 200, height: 1000)
+        let size = CGSize(width: (view.frame.width * 0.25) - 16, height: 1000)
         let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
         return NSString(string: text).boundingRect(with: size, options: options, attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 13)], context: nil)
     }
-    
     
     func enableSeekTime() {
         tagsTableviewLauncher.tableView.isUserInteractionEnabled = true
@@ -249,6 +285,11 @@ class ViewController: UIViewController {
         editBtn.setTitle("Edit", for: .normal)
         newTagBtn.setTitle("New tag", for: .normal)
         removeBtn.setTitle("Delete", for: .normal)
+        let img = UIImage(named: "fullscreen")?.withRenderingMode(.alwaysOriginal)
+        fullScreenBtn.layer.masksToBounds = true
+        fullScreenBtn.setImage(img, for: .normal)
+        fullScreenBtn.contentEdgeInsets = UIEdgeInsetsMake(8,8,8,8)
+        drawButton.setTitle("Draw", for: .normal)
         
     }
 
@@ -278,7 +319,6 @@ class ViewController: UIViewController {
         descriptionTextView.layer.borderWidth = 0.5
         descriptionTextView.layer.borderColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 0.5).cgColor
     }
-    
     
     func disAndEnableMultipleButtons(buttons: [UIButton], dissAble: [Bool]) {
         for (index, button) in buttons.enumerated() {

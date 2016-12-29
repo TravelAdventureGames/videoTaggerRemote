@@ -20,6 +20,9 @@
 		68A107B11DF5C46300AB03C4 /* play.png in Resources */ = {isa = PBXBuildFile; fileRef = 68A107AF1DF5C46300AB03C4 /* play.png */; };
 		68A107B41DF5D1CA00AB03C4 /* Tagpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A107B31DF5D1CA00AB03C4 /* Tagpoints.swift */; };
 		68A107B81DF6AEB500AB03C4 /* StartEndButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A107B71DF6AEB500AB03C4 /* StartEndButtons.swift */; };
+		68CF11001E129A8D0047E624 /* fullscreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 68CF10FF1E129A8D0047E624 /* fullscreen.png */; };
+		68CF11021E12A35B0047E624 /* DrawView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CF11011E12A35B0047E624 /* DrawView.swift */; };
+		68CF11041E12A8770047E624 /* Line.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CF11031E12A8770047E624 /* Line.swift */; };
 		68F047631E014B400036BB0B /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F047621E014B400036BB0B /* Video.swift */; };
 		68F047A41E08858E0036BB0B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 68F047A31E08858E0036BB0B /* GoogleService-Info.plist */; };
 		68F58CD81DFECDAA002D3574 /* edit2.png in Resources */ = {isa = PBXBuildFile; fileRef = 68F58CD61DFECDAA002D3574 /* edit2.png */; };
@@ -51,6 +54,9 @@
 		68A107AF1DF5C46300AB03C4 /* play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = play.png; sourceTree = "<group>"; };
 		68A107B31DF5D1CA00AB03C4 /* Tagpoints.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tagpoints.swift; sourceTree = "<group>"; };
 		68A107B71DF6AEB500AB03C4 /* StartEndButtons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StartEndButtons.swift; sourceTree = "<group>"; };
+		68CF10FF1E129A8D0047E624 /* fullscreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fullscreen.png; sourceTree = "<group>"; };
+		68CF11011E12A35B0047E624 /* DrawView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawView.swift; sourceTree = "<group>"; };
+		68CF11031E12A8770047E624 /* Line.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Line.swift; sourceTree = "<group>"; };
 		68F047621E014B400036BB0B /* Video.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
 		68F047A31E08858E0036BB0B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		68F047A51E088E760036BB0B /* VideoTagger.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VideoTagger.entitlements; sourceTree = "<group>"; };
@@ -124,6 +130,7 @@
 				68A107AA1DF5A43F00AB03C4 /* View */,
 				68A107AD1DF5A9DB00AB03C4 /* Controllers */,
 				68A1079C1DF5A13E00AB03C4 /* Main.storyboard */,
+				68CF10FF1E129A8D0047E624 /* fullscreen.png */,
 				68F58CDC1DFEFB43002D3574 /* newTag.png */,
 				68F58CD61DFECDAA002D3574 /* edit2.png */,
 				68F58CD71DFECDAA002D3574 /* edit1.png */,
@@ -144,6 +151,7 @@
 			isa = PBXGroup;
 			children = (
 				68F58CE51DFF4F16002D3574 /* CustomLeftBarbutton.swift */,
+				68CF11011E12A35B0047E624 /* DrawView.swift */,
 				68A107B71DF6AEB500AB03C4 /* StartEndButtons.swift */,
 				68A107AB1DF5A45B00AB03C4 /* VideoView.swift */,
 				681562E01DF866E600D71D54 /* TagpointTableCell.swift */,
@@ -167,6 +175,7 @@
 			children = (
 				68A107B31DF5D1CA00AB03C4 /* Tagpoints.swift */,
 				68F047621E014B400036BB0B /* Video.swift */,
+				68CF11031E12A8770047E624 /* Line.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -257,6 +266,7 @@
 				68A1079E1DF5A13E00AB03C4 /* Main.storyboard in Resources */,
 				68F047A41E08858E0036BB0B /* GoogleService-Info.plist in Resources */,
 				68F58CDD1DFEFB43002D3574 /* newTag.png in Resources */,
+				68CF11001E129A8D0047E624 /* fullscreen.png in Resources */,
 				68F61C1E1DFAB19C00F4F08D /* reddot-3.png in Resources */,
 				68F61C201DFB582200F4F08D /* reddot3.png in Resources */,
 			);
@@ -322,9 +332,11 @@
 				68A1079B1DF5A13E00AB03C4 /* ViewController.swift in Sources */,
 				681562E11DF866E600D71D54 /* TagpointTableCell.swift in Sources */,
 				68A107991DF5A13E00AB03C4 /* AppDelegate.swift in Sources */,
+				68CF11041E12A8770047E624 /* Line.swift in Sources */,
 				68A107B81DF6AEB500AB03C4 /* StartEndButtons.swift in Sources */,
 				68F58CE41DFF4BC0002D3574 /* ViewController+Delegate.swift in Sources */,
 				68F58CE21DFF4A9B002D3574 /* TagsTable+DataSource.swift in Sources */,
+				68CF11021E12A35B0047E624 /* DrawView.swift in Sources */,
 				681562DD1DF8512100D71D54 /* TagsTableviewLauncher.swift in Sources */,
 				68F58CE01DFF0A2B002D3574 /* LabelInset.swift in Sources */,
 				68A107B41DF5D1CA00AB03C4 /* Tagpoints.swift in Sources */,

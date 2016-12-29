@@ -12,6 +12,7 @@ extension ViewController: UITableViewDelegate {
     
     
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        videoView.removeImageDrawView()
         disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel, editBtn], dissAble: [false, true, true, true])
         if let selectedCell: TagpointTableCell = tableView.cellForRow(at: indexPath) as! TagpointTableCell? {
             let highlightedTag = videoView.titleTagDictArray[indexPath.row]
@@ -39,6 +40,12 @@ extension ViewController: UITableViewDelegate {
         titleTextField.isUserInteractionEnabled = false
         descriptionTextView.isUserInteractionEnabled = false
         disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel, editBtn, resetButton, newTagBtn, removeBtn], dissAble: [true, true, true, false, true, false, false])
+        
+        let tagPoint = tagPoints[indexPath.row]
+        let imgData = tagPoint["drawImg"] as! Data
+        let img = UIImage(data: imgData)
+        videoView.drawImage = img!
+        videoView.createDrawImageView()
         
         
         if let selectedCell: TagpointTableCell = tableView.cellForRow(at: indexPath) as! TagpointTableCell? {
@@ -84,7 +91,7 @@ extension ViewController: UITableViewDelegate {
         let tagpoint = tagPoints[indexPath.row]
         let comment = tagpoint["comment"] as! String
         height = estimateSizeOfCommentTextView(text: comment).height
-        return height + 40
+        return height + 56
     }
 
 
