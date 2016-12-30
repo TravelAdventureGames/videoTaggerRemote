@@ -177,11 +177,11 @@ class ViewController: UIViewController {
     func clearAllInputFiels() {
         titleTextField.text = nil
         descriptionTextView.text = nil
-        
-        
+   
     }
 
     @IBAction func createNewTag(_ sender: AnyObject) {
+        videoView.removeImageDrawView()
         setSelectedTableViewCellToDeselected()
         clearAllInputFiels()
         switchToEditingMode(self)
@@ -190,6 +190,7 @@ class ViewController: UIViewController {
     }
     
     @IBAction func removeTagWithButton(_ sender: AnyObject) {
+        videoView.removeImageDrawView()
         disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, resetButton, editBtn, removeBtn, newTagBtn], dissAble: [true,true, true, true, true, false])
         if let index = tagsTableviewLauncher.tableView.indexPathForSelectedRow {
             setSelectedTableViewCellToDeselected()

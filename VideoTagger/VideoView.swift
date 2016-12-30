@@ -169,11 +169,14 @@ class VideoView: UIView {
     }
     
     func createDrawImageView() {
-        imageDrawView.frame = self.bounds
-        imageDrawView.backgroundColor = .clear
-        addSubview(imageDrawView)
-        imageDrawView.image = drawImage
-        imageDrawView.contentMode = .scaleAspectFill
+        if drawImage != nil {
+            imageDrawView.frame = self.bounds
+            imageDrawView.backgroundColor = .clear
+            addSubview(imageDrawView)
+            imageDrawView.image = drawImage
+            imageDrawView.contentMode = .scaleAspectFill
+        }
+        
     }
     func removeImageDrawView() {
         imageDrawView.removeFromSuperview()
@@ -292,7 +295,7 @@ class VideoView: UIView {
     }
     
     func setUpPLayer() {
-        let urlString = "https://firebasestorage.googleapis.com/v0/b/videotrack-83e0d.appspot.com/o/lego.mov?alt=media&token=84f70a09-11d0-4406-bdfb-a8201ac54cb9"//"https://firebasestorage.googleapis.com/v0/b/gameofchats-762ca.appspot.com/o/message_movies%2F12323439-9729-4941-BA07-2BAE970967C7.mov?alt=media&token=3e37a093-3bc8-410f-84d3-38332af9c726"
+        let urlString = "https://firebasestorage.googleapis.com/v0/b/gameofchats-762ca.appspot.com/o/message_movies%2F12323439-9729-4941-BA07-2BAE970967C7.mov?alt=media&token=3e37a093-3bc8-410f-84d3-38332af9c726" //"https://firebasestorage.googleapis.com/v0/b/videotrack-83e0d.appspot.com/o/lego.mov?alt=media&token=84f70a09-11d0-4406-bdfb-a8201ac54cb9"//
         
         guard let url = URL(string: urlString) else { return }
             player = AVPlayer(url: url)

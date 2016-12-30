@@ -44,6 +44,7 @@ extension ViewController: UITableViewDelegate {
         let tagPoint = tagPoints[indexPath.row]
         let imgData = tagPoint["drawImg"] as! Data
         let img = UIImage(data: imgData)
+        
         videoView.drawImage = img!
         videoView.createDrawImageView()
         
