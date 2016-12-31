@@ -145,6 +145,7 @@ class VideoView: UIView {
     }
     
     func createAndStoreImageFromDrawing() {
+        drawImage = nil
         let renderer = UIGraphicsImageRenderer(size: drawView.bounds.size)
         let image = renderer.image { ctx in
             drawView.drawHierarchy(in: drawView.bounds, afterScreenUpdates: true)
@@ -157,7 +158,8 @@ class VideoView: UIView {
         drawView.lines? = []
         drawView.frame = self.bounds
         drawView.backgroundColor = .clear
-        addSubview(drawView)
+        controlsContainerView.insertSubview(drawView, belowSubview: playPauseButton)
+        //addSubview(drawView)
         drawView.setNeedsDisplay()
         
     }
@@ -169,13 +171,13 @@ class VideoView: UIView {
     }
     
     func createDrawImageView() {
-        if drawImage != nil {
+       if drawImage != nil {
             imageDrawView.frame = self.bounds
             imageDrawView.backgroundColor = .clear
             addSubview(imageDrawView)
             imageDrawView.image = drawImage
             imageDrawView.contentMode = .scaleAspectFill
-        }
+      }
         
     }
     func removeImageDrawView() {

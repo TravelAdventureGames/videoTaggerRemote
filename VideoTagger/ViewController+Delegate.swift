@@ -30,7 +30,6 @@ extension ViewController: UITableViewDelegate {
             selectedCell.beginTimeLabel.backgroundColor = .white
             selectedCell.beginTimeLabel.textColor = .black
             selectedCell.totalView.layer.borderWidth = 0.7
-            
         }
     }
     
@@ -45,8 +44,11 @@ extension ViewController: UITableViewDelegate {
         let imgData = tagPoint["drawImg"] as! Data
         let img = UIImage(data: imgData)
         
-        videoView.drawImage = img!
-        videoView.createDrawImageView()
+        if img != nil {
+            videoView.drawImage = img
+            videoView.createDrawImageView()
+        }
+        
         
         
         if let selectedCell: TagpointTableCell = tableView.cellForRow(at: indexPath) as! TagpointTableCell? {

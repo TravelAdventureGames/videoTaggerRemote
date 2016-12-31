@@ -7,12 +7,14 @@
 //
 
 import UIKit
+import MessageUI
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, MFMailComposeViewControllerDelegate {
     
     var tagPoints: [[String: AnyObject]] = []
     var allTagsShown = true
-    var button = UIButton(type: .custom)
+    var leftBarbutton = UIButton(type: .custom)
+    var rightBarbutton = UIButton(type: .custom)
     var tagsTableviewLauncher = TagsTableviewLauncher()
     
     var startPoint: Double?
@@ -22,7 +24,6 @@ class ViewController: UIViewController {
     
     var beginTimeWasSet = false
     var endTimeWasSet = false
-    var drawViewWasSet = false
     
     var isInEditMode = false
 
@@ -53,7 +54,7 @@ class ViewController: UIViewController {
         tagsTableviewLauncher.tableView.separatorStyle = .none
         
         loadSavedTagpoints()
-        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel, editBtn, newTagBtn, removeBtn], dissAble: [false, true, true, true, true, true])
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel, editBtn, newTagBtn, removeBtn, drawButton, resetButton], dissAble: [false, true, true, true, true, true, true, true])
         
         makeAllViewButtons()
         makeNavTitleViewWithImage()
@@ -71,7 +72,7 @@ class ViewController: UIViewController {
 
     @IBAction func startTime(_ sender: AnyObject) {
         beginTimeWasSet = true
-        disAndEnableMultipleButtons(buttons: [endBtnLabel, startBtnLabel, submitBtnLabel, resetButton], dissAble: [false, true, true, false])
+        disAndEnableMultipleButtons(buttons: [endBtnLabel, startBtnLabel, submitBtnLabel, resetButton, drawButton, resetButton], dissAble: [false, true, true, false, false, false])
         videoView.handlePause()
         videoView.startTimeSet = true
         videoView.startPointView.isHidden = false
@@ -80,11 +81,12 @@ class ViewController: UIViewController {
         let size = Double(videoView.frame.width)
         let leftAnchorConstant = size * videoView.startMultiplier - 8
         videoView.leftStartPointConstraint.constant = CGFloat(leftAnchorConstant)
-
+        videoView.removeDrawView()
+        videoView.createDrawView()
     }
 
     @IBAction func endTime(_ sender: AnyObject) {
-        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel], dissAble: [true, true, false])
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel, drawButton], dissAble: [true, true, false, true])
         endTimeWasSet = true
         videoView.handlePause()
         videoView.endPointView.isHidden = false
@@ -94,7 +96,7 @@ class ViewController: UIViewController {
         endTime = videoView.endTimeSeconds
         videoView.leftEndPointConstraint.constant = CGFloat(leftAnchorConstant) - 8
         videoView.startTimeSet = false
-        
+    
     }
     
     func loadSavedTagpoints() {
@@ -141,6 +143,7 @@ class ViewController: UIViewController {
             
         } else if titleTextField.text != "" && descriptionTextView.text != "" && beginTimeWasSet && endTimeWasSet  {
             videoView.createAndStoreImageFromDrawing()
+            
             guard let title = titleTextField.text, let comment = descriptionTextView.text, let beginTime = startTime, let endTime = endTime else { return }
             guard let sp = startPoint else { return }
             guard let ep = endPoint else { return }
@@ -148,8 +151,8 @@ class ViewController: UIViewController {
             guard let imgData = UIImagePNGRepresentation(img) else { return }
             
             let tagPoint: [String: AnyObject] = ["title": title as AnyObject, "comment": comment as AnyObject, "beginTime": beginTime as AnyObject, "endTime": endTime as AnyObject, "begMult": sp as AnyObject,"endMult": ep as AnyObject, "drawImg": imgData as AnyObject]
+            print("The tagpoint is \(tagPoint)")
             
-            drawViewWasSet = true
             videoView.removeDrawView()
 
             tagPoints.append(tagPoint as [String : AnyObject])
@@ -185,13 +188,13 @@ class ViewController: UIViewController {
         setSelectedTableViewCellToDeselected()
         clearAllInputFiels()
         switchToEditingMode(self)
-        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel, resetButton, newTagBtn], dissAble: [false, true, true, false, true])
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel, editBtn, newTagBtn, removeBtn, drawButton, resetButton], dissAble: [false, true, true, true, true, true, true, true])
         isInEditMode = false
     }
     
     @IBAction func removeTagWithButton(_ sender: AnyObject) {
         videoView.removeImageDrawView()
-        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, resetButton, editBtn, removeBtn, newTagBtn], dissAble: [true,true, true, true, true, false])
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel, editBtn, newTagBtn, removeBtn, drawButton, resetButton], dissAble: [false, true, true, true, true, true, true, true])
         if let index = tagsTableviewLauncher.tableView.indexPathForSelectedRow {
             setSelectedTableViewCellToDeselected()
             tagPoints.remove(at: index.row)
@@ -202,12 +205,13 @@ class ViewController: UIViewController {
     }
     
     @IBAction func resetTimes(_ sender: AnyObject) {
-        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel, editBtn, removeBtn], dissAble: [false, true, false, true, true])
+        disAndEnableMultipleButtons(buttons: [startBtnLabel, endBtnLabel, submitBtnLabel, editBtn, newTagBtn, removeBtn, drawButton, resetButton], dissAble: [false, true, true, true, true, true, true, true])
         endTimeWasSet = false
         beginTimeWasSet = false
         videoView.startTimeSet = false
         titleTextField.text = nil
         descriptionTextView.text = nil
+        videoView.removeDrawView()
         NotificationCenter.default.post(name: Notification.Name("WasReset"), object: nil)
     }
     @IBAction func switchFullScreenModus(_ sender: AnyObject) {
@@ -225,7 +229,7 @@ class ViewController: UIViewController {
         }
     }
     @IBAction func createDrawView(_ sender: AnyObject) {
-        drawViewWasSet = false
+        videoView.removeDrawView()
         videoView.createDrawView()
         
     }
@@ -295,21 +299,69 @@ class ViewController: UIViewController {
     }
 
     func makeLeftBarButtonItem() {
-        button = CustomLeftBarbutton()
-        button.addTarget(self, action: #selector(showAndHideAllTagsTableView), for: .touchUpInside)
+        leftBarbutton = CustomLeftBarbutton()
+        leftBarbutton.addTarget(self, action: #selector(showAndHideAllTagsTableView), for: .touchUpInside)
+        let leftBarButton = UIBarButtonItem()
+        leftBarButton.customView = leftBarbutton
+        navigationItem.leftBarButtonItem = leftBarButton
+        
+        rightBarbutton = CustomLeftBarbutton()
+        rightBarbutton.setTitle("Mail", for: .normal)
+        rightBarbutton.addTarget(self, action: #selector(exportEmail), for: .touchUpInside)
         let rightBarButton = UIBarButtonItem()
-        rightBarButton.customView = button
-        navigationItem.leftBarButtonItem = rightBarButton
+        rightBarButton.customView = rightBarbutton
+        navigationItem.rightBarButtonItem = rightBarButton
+ 
+    }
+
+    func exportEmail() {
+        let mailComposeViewController = configuredMailComposeViewController()
+        if MFMailComposeViewController.canSendMail() {
+            self.present(mailComposeViewController, animated: true, completion: nil)
+        } else {
+            self.showSendMailErrorAlert()
+        }
+    }
+    
+    func configuredMailComposeViewController() -> MFMailComposeViewController {
+        var emailBody = "De volgende fragmenten werden als waardevol bestempeld door de observant:"
+        for tp in tagPoints {
+            let beginTime = tp["beginTime"] as! Double
+            let (bhr, bmin, bsec) = beginTime.secondsToHoursMinutesSeconds()
+            let endTime = tp["endTime"] as! Double
+            let (ehr, emin, esec) = endTime.secondsToHoursMinutesSeconds()
+            let title = tp["title"] as! String
+            let description = tp["comment"] as! String
+            
+            //let et = Double(round(endTime*10)/10)
+            emailBody += "\n\n\(title): Starttijd: \(bhr):\(bmin):\(bsec), Eindtijd \(ehr):\(emin):\(esec)\n\(description)"
+        }
+        
+        print(emailBody)
+        
+        let mailComposerVC = MFMailComposeViewController()
+        mailComposerVC.mailComposeDelegate = self
+        mailComposerVC.setToRecipients(["martijn@traveladventuregames.nl"])
+        mailComposerVC.setSubject("Proces verbaal film")
+        mailComposerVC.setMessageBody("Sending e-mail in-app is not so bad!", isHTML: false)
+        
+        return mailComposerVC
+    }
+    
+    func showSendMailErrorAlert() {
+        let alert = UIAlertController(title: "Could Not Send Email", message: "Your device could not send e-mail.  Please check e-mail configuration and try again.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
         
     }
     
     func showAndHideAllTagsTableView() {
         if !allTagsShown {
-            button.setTitle("Hide", for: .normal)
+            leftBarbutton.setTitle("Hide", for: .normal)
             tagsTableviewLauncher.handleShow(withDelay: 0)
             
         } else {
-            button.setTitle("Show", for: .normal)
+            leftBarbutton.setTitle("Show", for: .normal)
             tagsTableviewLauncher.handleDismiss()
         }
         allTagsShown = !allTagsShown
