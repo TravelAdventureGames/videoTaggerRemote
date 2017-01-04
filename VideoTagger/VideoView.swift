@@ -120,6 +120,8 @@ class VideoView: UIView {
         return stpv
     }()
     
+    let detailView = DetailView()
+    
     override func layoutSublayers(of layer: CALayer) {
         playerLayer.frame = self.bounds
         controlsContainerView.frame = self.bounds

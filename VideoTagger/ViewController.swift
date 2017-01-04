@@ -16,6 +16,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate {
     var leftBarbutton = UIButton(type: .custom)
     var rightBarbutton = UIButton(type: .custom)
     var tagsTableviewLauncher = TagsTableviewLauncher()
+    var detailView: DetailView?
     
     var startPoint: Double?
     var endPoint: Double?
@@ -327,13 +328,11 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate {
         var emailBody = "De volgende fragmenten werden als waardevol bestempeld door de observant:"
         for tp in tagPoints {
             let beginTime = tp["beginTime"] as! Double
-            let (bhr, bmin, bsec) = beginTime.secondsToHoursMinutesSeconds()
+            let (bhr, bmin, bsec) = Int(beginTime).secondsToHoursMinutesSeconds()
             let endTime = tp["endTime"] as! Double
-            let (ehr, emin, esec) = endTime.secondsToHoursMinutesSeconds()
+            let (ehr, emin, esec) = Int(endTime).secondsToHoursMinutesSeconds()
             let title = tp["title"] as! String
             let description = tp["comment"] as! String
-            
-            //let et = Double(round(endTime*10)/10)
             emailBody += "\n\n\(title): Starttijd: \(bhr):\(bmin):\(bsec), Eindtijd \(ehr):\(emin):\(esec)\n\(description)"
         }
         
@@ -343,7 +342,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate {
         mailComposerVC.mailComposeDelegate = self
         mailComposerVC.setToRecipients(["martijn@traveladventuregames.nl"])
         mailComposerVC.setSubject("Proces verbaal film")
-        mailComposerVC.setMessageBody("Sending e-mail in-app is not so bad!", isHTML: false)
+        mailComposerVC.setMessageBody(emailBody, isHTML: false)
         
         return mailComposerVC
     }
